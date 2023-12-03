@@ -1,12 +1,31 @@
 {
-  "short_name": "nextarter-chakra",
-  "name": "Next.js App Template",
+  "name": "Clarity",
+  "description": "An app for reorientation ",
+  "short_name": "Clarity",
   "lang": "en",
   "start_url": "/",
-  "background_color": "#FFFFFF",
-  "theme_color": "#FFFFFF",
+  "background_color": "#B3D4FC",
+  "theme_color": "#0F4C81",
   "dir": "ltr",
   "display": "standalone",
   "orientation": "portrait",
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "clarity_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "clarity_192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "clarity_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }
