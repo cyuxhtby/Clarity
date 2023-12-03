@@ -9,7 +9,7 @@ const Meta = () => {
       <meta name="apple-mobile-web-app-title" content={APP_NAME} />
       <meta name="format-detection" content="telephone=no" />
       <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="theme-color" content="#0F4C81" />
+      <meta name="theme-color" content="#FFFFFF" />
 
       <link rel="shortcut icon" href="/favicon.ico" />
       <link rel="icon" href="/icons/clarity_512.png" />
