@@ -17,9 +17,8 @@
     "format": "prettier --write src",
     "up-interactive": "pnpm up -i",
     "up-latest": "pnpm up-interactive -L",
-    "release": "cross-env HUSKY=0 standard-version",
-    "push-release": "git push --follow-tags origin main",
-    "prepare": "husky install"
+    "release": "cross-env standard-version",
+    "push-release": "git push --follow-tags origin main"
   },
   "dependencies": {
     "@chakra-ui/next-js": "^2.1.5",
@@ -51,7 +50,7 @@
     "typescript": "^5.2.2"
   },
   "engines": {
-    "node": ">=16.x.x",
-    "pnpm": ">=8"
+    "node": "16.x",
+    "pnpm": "8"
   }
 }
