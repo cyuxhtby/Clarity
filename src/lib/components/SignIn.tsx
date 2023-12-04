@@ -20,11 +20,12 @@ const SignIn = () => {
         width="60%"
         colorScheme="teal"
         variant="solid"
-        mt={6}
+        mt={8}
         onClick={handleSignIn}
       >
         Log in
       </Button>
+      <Text transform="scale(0.65)" mt={4}>In Safari tap share icon to add to home screen</Text>
     </VStack>
   );
 };
