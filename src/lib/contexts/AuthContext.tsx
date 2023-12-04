@@ -5,6 +5,7 @@ import {
   signInWithRedirect,
   onAuthStateChanged,
   signOut as firebaseSignOut,
+  signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '~/lib/utils/firebaseConfig';
 interface AuthContextType {
@@ -39,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithRedirect(auth, provider);
+      await signInWithPopup(auth, provider);
     } catch (error) {
       console.error('Error signing in with Google: ', error);
     }
