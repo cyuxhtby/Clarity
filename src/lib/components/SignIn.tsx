@@ -1,7 +1,14 @@
+"use client"
 import { Button, Text, VStack } from '@chakra-ui/react';
+import { useAuth } from '~/lib/contexts/AuthContext'; 
 
-const CTASection = () => {
+const SignIn = () => {
   // useColorModeValue used to switch colors based on the theme (light/dark mode)
+  const { signInWithGoogle } = useAuth();
+
+  const handleSignIn = () => {
+    signInWithGoogle();
+  };
 
   return (
     <VStack height="100%" justifyContent="center" textAlign="center" p={8}>
@@ -13,7 +20,8 @@ const CTASection = () => {
         width="60%"
         colorScheme="teal"
         variant="solid"
-        mt={6} // Margin top
+        mt={6} 
+        onClick={handleSignIn} 
       >
         Log in
       </Button>
@@ -21,4 +29,4 @@ const CTASection = () => {
   );
 };
 
-export default CTASection;
+export default SignIn;

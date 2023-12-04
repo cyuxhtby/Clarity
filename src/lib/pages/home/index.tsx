@@ -1,8 +1,15 @@
+"use client"
+import React from 'react';
+import { useAuth } from '~/lib/contexts/AuthContext';
+
 import { Flex } from '@chakra-ui/react';
 
-import CTASection from '~/lib/components/samples/CTASection';
+import SignIn from '~/lib/components/SignIn';
+import { Welcome } from '~/lib/components/Welcome';
+
 
 const Home = () => {
+  const { user } = useAuth();
   return (
     <Flex
       direction="column"
@@ -13,7 +20,7 @@ const Home = () => {
       mb={8}
       w="full"
     >
-      <CTASection />
+      {user ? <Welcome /> : <SignIn />}
     </Flex>
   );
 };
