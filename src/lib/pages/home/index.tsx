@@ -1,12 +1,10 @@
-"use client"
-import React from 'react';
-import { useAuth } from '~/lib/contexts/AuthContext';
+'use client';
 
 import { Flex } from '@chakra-ui/react';
 
 import SignIn from '~/lib/components/SignIn';
 import { Welcome } from '~/lib/components/Welcome';
-
+import { useAuth } from '~/lib/contexts/AuthContext';
 
 const Home = () => {
   const { user } = useAuth();

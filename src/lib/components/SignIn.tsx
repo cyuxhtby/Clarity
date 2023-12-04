@@ -1,6 +1,6 @@
-"use client"
+'use client';
 import { Button, Text, VStack } from '@chakra-ui/react';
-import { useAuth } from '~/lib/contexts/AuthContext'; 
+import { useAuth } from '~/lib/contexts/AuthContext';
 
 const SignIn = () => {
   // useColorModeValue used to switch colors based on the theme (light/dark mode)
@@ -20,8 +20,8 @@ const SignIn = () => {
         width="60%"
         colorScheme="teal"
         variant="solid"
-        mt={6} 
-        onClick={handleSignIn} 
+        mt={6}
+        onClick={handleSignIn}
       >
         Log in
       </Button>

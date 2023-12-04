@@ -1,9 +1,14 @@
-"use client"
+'use client';
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { GoogleAuthProvider, signInWithRedirect, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
+import {
+  GoogleAuthProvider,
+  signInWithRedirect,
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+} from 'firebase/auth';
 import { auth } from '~/lib/utils/firebaseConfig';
 interface AuthContextType {
-  user: any; 
+  user: any;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -18,7 +23,9 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {

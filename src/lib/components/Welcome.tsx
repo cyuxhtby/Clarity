@@ -1,7 +1,7 @@
-"use client"
+'use client';
 import React, { useState } from 'react';
 import { VStack, Text, Input, Button } from '@chakra-ui/react';
-import { useAuth } from '~/lib/contexts/AuthContext'; 
+import { useAuth } from '~/lib/contexts/AuthContext';
 
 export const Welcome = () => {
   const { signOut } = useAuth();
@@ -33,12 +33,16 @@ export const Welcome = () => {
           onChange={(e) => setNewDate(e.target.value)}
           type="date"
         />
-        <Button colorScheme="blue" onClick={handleAddItem}>Add Item</Button>
+        <Button colorScheme="blue" onClick={handleAddItem}>
+          Add Item
+        </Button>
       </VStack>
       {items.map((item, index) => (
-        <Text>  hours until .... shi idk </Text>
+        <Text> hours until .... shi idk </Text>
       ))}
-      <Button colorScheme="red" onClick={signOut}>Sign Out</Button>
+      <Button colorScheme="red" onClick={signOut}>
+        Sign Out
+      </Button>
     </VStack>
   );
 };
