@@ -1,48 +1,39 @@
-'use client';
-import React, { useState } from 'react';
-import { VStack, Text, Input, Button } from '@chakra-ui/react';
-import { useAuth } from '~/lib/contexts/AuthContext';
+import React from 'react';
+import { VStack, Text, Button, Box } from '@chakra-ui/react';
+import AddItem from '~/lib/components/modals/AddItem'
 
 export const Welcome = () => {
-  const { signOut } = useAuth();
-  const [items, setItems] = useState([]);
-  const [newItem, setNewItem] = useState('');
-  const [newDate, setNewDate] = useState('');
-
-  const handleAddItem = () => {
-    const date = new Date(newDate);
+ 
     const now = new Date();
-    //const hoursUntil = Math.abs(date - now) / 36e5; // 36e5 is the scientific notation for 60*60*1000, converting milliseconds to hours
-    //setItems([...items, { name: newItem, date: newDate, hoursUntil }]);
-    setNewItem('');
-    setNewDate('');
-  };
+    const day = now.toLocaleDateString('en-US', { weekday: 'long' });
+    const date = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
+
 
   return (
-    <VStack spacing={4}>
-      <Text fontSize="2xl">Welcome to the App!</Text>
-      <VStack spacing={2} align="stretch">
-        <Input
-          placeholder="Item name"
-          value={newItem}
-          onChange={(e) => setNewItem(e.target.value)}
-        />
-        <Input
-          placeholder="Date (e.g., 2023-07-20)"
-          value={newDate}
-          onChange={(e) => setNewDate(e.target.value)}
-          type="date"
-        />
-        <Button colorScheme="blue" onClick={handleAddItem}>
-          Add Item
-        </Button>
-      </VStack>
-      {items.map((item, index) => (
-        <Text> hours until .... shi idk </Text>
-      ))}
-      <Button colorScheme="red" onClick={signOut}>
-        Sign Out
-      </Button>
+    <VStack
+      spacing={4}
+      justifyContent="center"
+      alignItems="center"
+      height="100%"
+      p={2}
+    >
+      <Box textAlign="center" mb={20}>
+        <Text fontSize="6xl" fontWeight="bold" mb={2}>
+          {day}
+        </Text>
+        <Text fontSize="2xl" fontWeight="bold">
+          {date}
+        </Text>
+        <Text fontSize="5xl" fontWeight="bold" mt={2}>
+          {time}
+        </Text>
+      </Box>
+      <Box mt={10}>
+      <AddItem/>
+      </Box>
     </VStack>
   );
 };
+
+export default Welcome;
