@@ -15,11 +15,13 @@ import {
 } from '@chakra-ui/react';
 import { collection, addDoc, Timestamp} from "firebase/firestore";
 import { firestore as db} from '~/lib/utils/firebaseConfig';
+import { useAuth } from '~/lib/contexts/AuthContext';
 
 const AddItem = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [itemName, setItemName] = useState('');
   const [itemDate, setItemDate] = useState('');
+  const { user } = useAuth();
 
   const bg = useColorModeValue('rgba(255, 255, 255, 0.8)', 'rgba(26, 32, 44, 0.8)'); 
   const backdropFilter = useColorModeValue('blur(10px)', 'blur(15px)'); 
@@ -32,12 +34,17 @@ const AddItem = () => {
       console.error("Item name and date are required");
       return;
     }
+    if (!user) {
+      console.error("User must be logged in to add items");
+      return;
+    }
   
     try {
       const itemsCollectionRef = collection(db, "items");
-      
+    
       const itemDateTimestamp = Timestamp.fromDate(new Date(itemDate + "T00:00:00")); 
       const docRef = await addDoc(itemsCollectionRef, {
+        userId: user.uid, // Include the user's ID
         name: itemName,
         dueDate: itemDateTimestamp,
         createdAt: Timestamp.fromDate(new Date()),
@@ -46,7 +53,7 @@ const AddItem = () => {
       console.log("Document written with ID: ", docRef.id);
       setItemName('');
       setItemDate('');
-      onClose(); // Close the after submission
+      onClose(); // Close the modal after submission
     } catch (error) {
       console.error("Error adding document: ", error);
     }
