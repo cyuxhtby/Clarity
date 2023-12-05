@@ -20,7 +20,7 @@ import { useAuth } from '~/lib/contexts/AuthContext';
 const AddItem = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [itemName, setItemName] = useState('');
-  const [itemDate, setItemDate] = useState('');
+  const [itemDateTime, setItemDateTime] = useState('');
   const { user } = useAuth();
 
   const bg = useColorModeValue('rgba(255, 255, 255, 0.8)', 'rgba(26, 32, 44, 0.8)'); 
@@ -30,7 +30,7 @@ const AddItem = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!itemName.trim() || !itemDate.trim()) {
+    if (!itemName.trim() || !itemDateTime.trim()) {
       console.error("Item name and date are required");
       return;
     }
@@ -42,18 +42,17 @@ const AddItem = () => {
     try {
       const itemsCollectionRef = collection(db, "items");
     
-      const itemDateTimestamp = Timestamp.fromDate(new Date(itemDate + "T00:00:00")); 
+      const itemDateTimestamp = Timestamp.fromDate(new Date(itemDateTime)); 
       const docRef = await addDoc(itemsCollectionRef, {
-        userId: user.uid, // Include the user's ID
+        userId: user.uid, 
         name: itemName,
         dueDate: itemDateTimestamp,
         createdAt: Timestamp.fromDate(new Date()),
       });
   
-      console.log("Document written with ID: ", docRef.id);
       setItemName('');
-      setItemDate('');
-      onClose(); // Close the modal after submission
+      setItemDateTime('');
+      onClose(); 
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -91,9 +90,9 @@ const AddItem = () => {
               <FormControl mt={4}>
                 <FormLabel>By when?</FormLabel>
                 <Input
-                  type="date"
-                  value={itemDate}
-                  onChange={(e) => setItemDate(e.target.value)}
+                  type="datetime-local"
+                  value={itemDateTime}
+                  onChange={(e) => setItemDateTime(e.target.value)}
                 />
               </FormControl>
             </ModalBody>

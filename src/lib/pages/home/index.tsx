@@ -8,11 +8,15 @@ import { Welcome } from '~/lib/components/Welcome';
 import Countdown from '~/lib/components/Countdown';
 import { useAuth } from '~/lib/contexts/AuthContext';
 
-const MotionBox = motion(Flex);
-
 const Home = () => {
   const { user } = useAuth();
-  const [currentView, setCurrentView] = useState('welcome'); // welcome or countdown
+  const [currentView, setCurrentView] = useState('welcome');
+
+  const variants = {
+    initial: { opacity: 0, y: 20 }, 
+    animate: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeInOut" } }, 
+    exit: { opacity: 0, y: -30, transition: { duration: 0.7, ease: "easeInOut" } }, 
+  };
 
   const swipeRight = () => {
     if (currentView === 'welcome') setCurrentView('countdown');
@@ -49,30 +53,16 @@ const Home = () => {
         <AnimatePresence>
           <motion.div
             key={currentView}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
+            variants={variants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
             onDragEnd={handleSwipe}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
           >
             {currentView === 'welcome' ? <Welcome /> : <Countdown />}
           </motion.div>
-          {/* Invisible Box for Swiping */}
-          {currentView === 'countdown' && (
-            <MotionBox
-              position="absolute"
-              top={0}
-              left={0}
-              right={0}
-              bottom={0}
-              bg="transparent" 
-              onDragEnd={handleSwipe}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              zIndex={-1} 
-            />
-          )}
         </AnimatePresence>
       )}
     </Flex>

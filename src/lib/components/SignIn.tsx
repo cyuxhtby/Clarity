@@ -24,7 +24,7 @@ const SignIn = () => {
       >
         Log in
       </Button>
-      <Text transform={{base: "scale(0.65)", md: "scale(0.9)"}} mt={4}>In Safari tap the share icon to add to home screen</Text>
+      <Text transform={{base: "scale(0.65)", md: "scale(0.9)"}} mt={4}>To enable app, open Safari tap the share icon and add to home screen</Text>
     </VStack>
   );
 };
