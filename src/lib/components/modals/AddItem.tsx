@@ -70,11 +70,11 @@ const AddItem = () => {
           p={6}
           boxShadow="xl"
         >
-          <ModalHeader>Add something bby</ModalHeader>
+          <ModalHeader>What do you want to do?</ModalHeader>
           <form onSubmit={handleSubmit}>
             <ModalBody>
               <FormControl>
-                <FormLabel>You want to</FormLabel>
+                <FormLabel>I want to</FormLabel>
                 <Input
                   value={itemName}
                   onChange={(e) => setItemName(e.target.value)}
@@ -82,7 +82,7 @@ const AddItem = () => {
               </FormControl>
 
               <FormControl mt={4}>
-                <FormLabel>By when</FormLabel>
+                <FormLabel>By when?</FormLabel>
                 <Input
                   type="date"
                   value={itemDate}
