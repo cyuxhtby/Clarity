@@ -3,7 +3,6 @@ import { Button, Text, VStack } from '@chakra-ui/react';
 import { useAuth } from '~/lib/contexts/AuthContext';
 
 const SignIn = () => {
-  // useColorModeValue used to switch colors based on the theme (light/dark mode)
   const { signInWithGoogle } = useAuth();
 
   const handleSignIn = () => {
@@ -25,7 +24,7 @@ const SignIn = () => {
       >
         Log in
       </Button>
-      <Text transform="scale(0.65)" mt={4}>In Safari tap share icon to add to home screen</Text>
+      <Text transform={{base: "scale(0.65)", md: "scale(0.9)"}} mt={4}>In Safari tap the share icon to add to home screen</Text>
     </VStack>
   );
 };

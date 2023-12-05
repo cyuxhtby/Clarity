@@ -13,7 +13,7 @@ import {
   useDisclosure,
   useColorModeValue
 } from '@chakra-ui/react';
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, Timestamp} from "firebase/firestore";
 import { firestore as db} from '~/lib/utils/firebaseConfig';
 
 const AddItem = () => {
@@ -21,9 +21,9 @@ const AddItem = () => {
   const [itemName, setItemName] = useState('');
   const [itemDate, setItemDate] = useState('');
 
-  const bg = useColorModeValue('rgba(255, 255, 255, 0.8)', 'rgba(26, 32, 44, 0.8)'); // Light/Dark background
-  const backdropFilter = useColorModeValue('blur(10px)', 'blur(15px)'); // Light/Dark blur
-  const colorScheme = useColorModeValue('blue', 'blue'); // Light/Dark button color scheme
+  const bg = useColorModeValue('rgba(255, 255, 255, 0.8)', 'rgba(26, 32, 44, 0.8)'); 
+  const backdropFilter = useColorModeValue('blur(10px)', 'blur(15px)'); 
+  const colorScheme = useColorModeValue('blue', 'blue'); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,17 +35,18 @@ const AddItem = () => {
   
     try {
       const itemsCollectionRef = collection(db, "items");
-  
+      
+      const itemDateTimestamp = Timestamp.fromDate(new Date(itemDate + "T00:00:00")); 
       const docRef = await addDoc(itemsCollectionRef, {
         name: itemName,
-        dueDate: itemDate,
-        createdAt: new Date(),
+        dueDate: itemDateTimestamp,
+        createdAt: Timestamp.fromDate(new Date()),
       });
   
       console.log("Document written with ID: ", docRef.id);
       setItemName('');
       setItemDate('');
-      onClose(); // Close the modal after submission
+      onClose(); // Close the after submission
     } catch (error) {
       console.error("Error adding document: ", error);
     }
