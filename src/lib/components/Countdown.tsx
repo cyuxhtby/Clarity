@@ -69,18 +69,21 @@ const Countdown = () => {
     const targetDate = dueDate.toDate();
     const difference = targetDate.getTime() - now.getTime();
   
-    let timeLeft: TimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
-  
     if (difference > 0) {
-      timeLeft = {
+      return {
         days: Math.floor(difference / (1000 * 60 * 60 * 24)),
         hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
         minutes: Math.floor((difference / 1000 / 60) % 60),
         seconds: Math.floor((difference / 1000) % 60),
       };
+    } else {
+      return {
+        days: Math.floor(-difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((-difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((-difference / 1000 / 60) % 60),
+        seconds: Math.floor((-difference / 1000) % 60),
+      };
     }
-  
-    return timeLeft;
   };
   
   const bg = useColorModeValue('gray.50', 'gray.800'); 
@@ -115,6 +118,7 @@ const Countdown = () => {
       {items.length > 0 ? (
         items.map((item) => {
           const timeLeft = calculateTimeLeft(item.dueDate);
+          const isOverdue = new Date(item.dueDate.toDate()).getTime() < new Date().getTime();
           return (
             <Box
               key={item.id}
@@ -132,9 +136,18 @@ const Countdown = () => {
               <Text fontSize="lg" fontWeight="bold" mb={1}>
                 {item.name}
               </Text>
-              {Object.keys(timeLeft).length > 0 && (
+              {isOverdue ? (
+                <>
+                <Text fontSize="md" display="inline">
+                   Time elapsed: 
+                </Text>
+                <Text fontSize="md" display="inline" color={"red.500"}>
+                  {` ${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
+                </Text>
+              </>
+              ) : (
                 <Text fontSize="md">
-                  Time left: {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+                  Time left: {`${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
                 </Text>
               )}
             </Box>
