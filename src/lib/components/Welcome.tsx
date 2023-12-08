@@ -1,6 +1,6 @@
 import React from 'react';
 import { VStack, Text, Button, Box } from '@chakra-ui/react';
-import AddItem from '~/lib/components/modals/AddItem'
+import AddTask from '~/lib/components/modals/AddTask'
 
 export const Welcome = () => {
  
@@ -30,7 +30,7 @@ export const Welcome = () => {
         </Text>
       </Box>
       <Box mt={10}>
-      <AddItem/>
+      <AddTask/>
       </Box>
     </VStack>
   );

@@ -62,7 +62,7 @@ const AddItem = () => {
   return (
     <>
       <Button onClick={onOpen} colorScheme={colorScheme} size="lg">
-        Add Item
+        Add Task
       </Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -76,11 +76,11 @@ const AddItem = () => {
           p={6}
           boxShadow="xl"
         >
-          <ModalHeader>What do you want to do?</ModalHeader>
+          <ModalHeader>What do you have to do?</ModalHeader>
           <form onSubmit={handleSubmit}>
             <ModalBody>
               <FormControl>
-                <FormLabel>I want to</FormLabel>
+                <FormLabel>I have to</FormLabel>
                 <Input
                   value={itemName}
                   onChange={(e) => setItemName(e.target.value)}
