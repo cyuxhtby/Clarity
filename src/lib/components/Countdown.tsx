@@ -9,7 +9,7 @@ import { useAuth } from '~/lib/contexts/AuthContext';
 import  DeleteTask from '~/lib/components/modals/DeleteTask'
 
 
-interface Item {
+interface Task {
   id: string;
   name: string;
   dueDate: Timestamp;
@@ -24,7 +24,7 @@ interface TimeLeft {
   
 
 const Countdown = () => {
-  const [items, setItems] = useState<Item[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const { user } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -32,29 +32,32 @@ const Countdown = () => {
 
   useEffect(() => {
     if (!user) {
-      // Handle the case where the user is not logged in
       console.log("User not logged in");
       return;
     }
 
-    // Only query items that belong to the logged-in user
-    const q = query(collection(db, "items"), where("userId", "==", user.uid));
-
-    const unsubscribe = onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
-      const itemsData: Item[] = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name as string,
-        dueDate: doc.data().dueDate as Timestamp,
-      }));
-      setItems(itemsData);
+    const userDocRef = doc(db, "users", user.uid);
+    const tasksCollectionRef = collection(userDocRef, "tasks");
+    const q = tasksCollectionRef; 
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const tasksData = querySnapshot.docs.map(doc => {
+        const docData = doc.data();
+        return {
+          id: doc.id,
+          name: docData.name,
+          dueDate: docData.dueDate,
+        };
+      });
+      setTasks(tasksData);
     });
 
     return () => unsubscribe();
   }, [user]);
 
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setItems(currentItems => {
+      setTasks(currentItems => {
         return currentItems.map(item => {
           return { ...item }; // Trigger re-render by creating a new object
         });
@@ -106,17 +109,23 @@ const Countdown = () => {
   };
 
   const handleDeleteConfirm = async () => {
-    if (selectedItemId) {
-      await deleteDoc(doc(db, "items", selectedItemId));
+    if (selectedItemId && user) {
+      const taskDocRef = doc(db, "users", user.uid, "tasks", selectedItemId);
+      try {
+        await deleteDoc(taskDocRef);
+      } catch (error) {
+        console.error("Error deleting task: ", error);
+      }
       setSelectedItemId(null);
-      onClose(); 
+      onClose();
     }
   };
+  
  
   return (
     <VStack spacing={4} align="stretch">
-      {items.length > 0 ? (
-        items.map((item) => {
+      {tasks.length > 0 ? (
+        tasks.map((item) => {
           const timeLeft = calculateTimeLeft(item.dueDate);
           const isOverdue = new Date(item.dueDate.toDate()).getTime() < new Date().getTime();
           return (

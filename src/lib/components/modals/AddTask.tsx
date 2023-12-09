@@ -13,11 +13,11 @@ import {
   useDisclosure,
   useColorModeValue
 } from '@chakra-ui/react';
-import { collection, addDoc, Timestamp} from "firebase/firestore";
+import { collection, addDoc, doc, Timestamp} from "firebase/firestore";
 import { firestore as db} from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 
-const AddItem = () => {
+const AddTask = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [itemName, setItemName] = useState('');
   const [itemDateTime, setItemDateTime] = useState('');
@@ -35,20 +35,21 @@ const AddItem = () => {
       return;
     }
     if (!user) {
-      console.error("User must be logged in to add items");
+      console.error("User must be logged in to add tasks");
       return;
     }
   
     try {
-      const itemsCollectionRef = collection(db, "items");
-    
+      const userDocRef = doc(db, "users", user.uid); 
+      const tasksCollectionRef = collection(userDocRef, "tasks"); 
       const itemDateTimestamp = Timestamp.fromDate(new Date(itemDateTime)); 
-      const docRef = await addDoc(itemsCollectionRef, {
-        userId: user.uid, 
+      const taskDoc = {
         name: itemName,
         dueDate: itemDateTimestamp,
-        createdAt: Timestamp.fromDate(new Date()),
-      });
+        createdAt: Timestamp.fromDate(new Date())
+      };
+  
+      const docRef = await addDoc(tasksCollectionRef, taskDoc);
   
       setItemName('');
       setItemDateTime('');
@@ -76,11 +77,11 @@ const AddItem = () => {
           p={6}
           boxShadow="xl"
         >
-          <ModalHeader>What do you have to do?</ModalHeader>
+          <ModalHeader>What do you want to do?</ModalHeader>
           <form onSubmit={handleSubmit}>
             <ModalBody>
               <FormControl>
-                <FormLabel>I have to</FormLabel>
+                <FormLabel>I want to</FormLabel>
                 <Input
                   value={itemName}
                   onChange={(e) => setItemName(e.target.value)}
@@ -109,4 +110,4 @@ const AddItem = () => {
   );
 };
 
-export default AddItem;
+export default AddTask;
