@@ -1,1 +1,1 @@
-export const KEY = process.env.NEXT_PUBLIC_KEY || '';
+export const VAPID_KEY = process.env.NEXT_PUBLIC_VAPID_KEY || '';
