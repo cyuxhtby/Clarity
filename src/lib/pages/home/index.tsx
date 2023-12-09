@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Flex } from '@chakra-ui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import SignIn from '~/lib/components/SignIn';
@@ -36,6 +36,18 @@ const Home = () => {
       swipeRight();
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then(registration => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch(err => {
+          console.error('Service Worker registration failed:', err);
+        });
+    }
+  }, [user]); 
 
   return (
     <Flex
