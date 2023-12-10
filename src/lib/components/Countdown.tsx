@@ -6,7 +6,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { Timestamp, QuerySnapshot, DocumentData, deleteDoc, doc } from 'firebase/firestore';
 import { useAuth } from '~/lib/contexts/AuthContext';
-import  DeleteTask from '~/lib/components/modals/DeleteTask'
+import DeleteItem from '~/lib/components/modals/DeleteItem';
 
 
 interface Task {
@@ -167,7 +167,7 @@ const Countdown = () => {
       )}
 
       
-      <DeleteTask
+      <DeleteItem
     isOpen={isOpen}
     onConfirm={handleDeleteConfirm}
     onCancel={() => {

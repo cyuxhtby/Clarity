@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import SignIn from '~/lib/components/SignIn';
 import { Welcome } from '~/lib/components/Welcome';
 import Countdown from '~/lib/components/Countdown';
+import Notes from '~/lib/components/Notes'; 
 import { useAuth } from '~/lib/contexts/AuthContext';
 
 const Home = () => {
@@ -20,10 +21,12 @@ const Home = () => {
 
   const swipeRight = () => {
     if (currentView === 'welcome') setCurrentView('countdown');
+    else if (currentView === 'countdown') setCurrentView('notes');
   };
 
   const swipeLeft = () => {
-    if (currentView === 'countdown') setCurrentView('welcome');
+    if (currentView === 'notes') setCurrentView('countdown');
+    else if (currentView === 'countdown') setCurrentView('welcome');
   };
 
   const swipeThreshold = 100;
@@ -73,7 +76,8 @@ const Home = () => {
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
           >
-            {currentView === 'welcome' ? <Welcome /> : <Countdown />}
+            {currentView === 'welcome' ? <Welcome /> : 
+             currentView === 'countdown' ? <Countdown /> : <Notes />}
           </motion.div>
         </AnimatePresence>
       )}

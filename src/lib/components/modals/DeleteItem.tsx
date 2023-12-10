@@ -32,7 +32,7 @@ const DeleteItem: React.FC<DeleteItemProps> = ({ isOpen, onConfirm, onCancel }) 
         p={6}
         boxShadow="xl"
       >
-        <ModalHeader alignContent="center">Have you completed this?</ModalHeader>
+        <ModalHeader alignContent="center">Done with this?</ModalHeader>
         <ModalFooter justifyContent="center">
           <Button colorScheme={colorScheme} px={5} mr={2} onClick={onConfirm}>
             Yes
