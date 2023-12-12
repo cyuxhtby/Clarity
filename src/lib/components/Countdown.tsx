@@ -35,12 +35,12 @@ const Countdown = () => {
       console.log("User not logged in");
       return;
     }
-
+  
     const userDocRef = doc(db, "users", user.uid);
     const tasksCollectionRef = collection(userDocRef, "tasks");
     const q = tasksCollectionRef; 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const tasksData = querySnapshot.docs.map(doc => {
+      let tasksData = querySnapshot.docs.map(doc => {
         const docData = doc.data();
         return {
           id: doc.id,
@@ -48,11 +48,13 @@ const Countdown = () => {
           dueDate: docData.dueDate,
         };
       });
+      
+      tasksData.sort((a, b) => a.dueDate.toDate() - b.dueDate.toDate());
       setTasks(tasksData);
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user]);  
 
 
   useEffect(() => {
