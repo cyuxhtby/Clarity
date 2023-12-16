@@ -143,6 +143,7 @@ const Countdown = () => {
               onPointerDown={() => handlePressStart(item.id)} 
               onPointerUp={handlePressEnd} 
               onPointerLeave={handlePressEnd} 
+              zIndex={20}
             >
               <Text fontSize="lg" fontWeight="bold" mb={1}>
                 {item.name}

@@ -30,7 +30,7 @@ export const Welcome = () => {
           {time}
         </Text>
       </Box>
-      <Box mt={10}>
+      <Box mt={10} zIndex={20}>
         <VStack spacing={4}>
         <AddTask/>
         <AddNote/>

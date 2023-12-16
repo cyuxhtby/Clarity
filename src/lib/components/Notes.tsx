@@ -88,6 +88,7 @@ const Notes = () => {
             onPointerDown={() => handlePressStart(note.id)} 
             onPointerUp={handlePressEnd} 
             onPointerLeave={handlePressEnd} 
+            zIndex={20}
           >
             <Text fontSize="lg" fontWeight={"bold"}>
                 {note.text}

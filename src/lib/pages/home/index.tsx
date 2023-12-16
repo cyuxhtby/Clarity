@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Flex } from '@chakra-ui/react';
+import { Flex, Box } from '@chakra-ui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import SignIn from '~/lib/components/SignIn';
 import { Welcome } from '~/lib/components/Welcome';
@@ -12,6 +12,10 @@ import { useAuth } from '~/lib/contexts/AuthContext';
 const Home = () => {
   const { user } = useAuth();
   const [currentView, setCurrentView] = useState('welcome');
+
+  const isDesktop = () => {
+    return window.innerWidth > 1024 && !/Mobi|Android/i.test(navigator.userAgent);
+  };
 
   const variants = {
     initial: { opacity: 0, y: 20 }, 
@@ -52,6 +56,12 @@ const Home = () => {
     }
   }, [user]); 
 
+  const headerHeight = '70px'; 
+  const footerHeight = '40px'; 
+
+  const showLeftOverlay = currentView !== 'welcome';
+  const showRightOverlay = currentView !== 'notes';
+
   return (
     <Flex
       direction="column"
@@ -61,7 +71,37 @@ const Home = () => {
       gap={4}
       mb={8}
       w="full"
+      position="relative"
     >
+      {isDesktop() && (
+        <>
+          {showLeftOverlay && (
+            <Box
+              position="fixed"
+              left={0}
+              top={headerHeight}
+              bottom={footerHeight}
+              w="50vw"
+              onClick={swipeLeft}
+              cursor="w-resize" 
+              zIndex="10"
+            />
+          )}
+          {showRightOverlay && (
+            <Box
+              position="fixed"
+              right={0}
+              top={headerHeight}
+              bottom={footerHeight}
+              w="50vw"
+              onClick={swipeRight}
+              cursor="e-resize" 
+              zIndex="10"
+            />
+          )}
+        </>
+      )}
+      {/* Main content */}
       {!user ? (
         <SignIn />
       ) : (
