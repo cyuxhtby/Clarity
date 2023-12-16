@@ -19,7 +19,7 @@ export const Welcome = () => {
       height="100%"
       p={2}
     >
-      <Box textAlign="center" mb={20}>
+      <Box textAlign="center" mb={20} zIndex={20}>
         <Text fontSize="6xl" fontWeight="bold" mb={2}>
           {day}
         </Text>
