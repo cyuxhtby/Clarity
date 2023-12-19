@@ -34,10 +34,12 @@ const Notes = () => {
         link: doc.data().link,
         createdAt: doc.data().createdAt,
       }));
-      setNotes(notesData);
+      const sortedNotesData = notesData.sort((a, b) => a.createdAt - b.createdAt)
+      setNotes(sortedNotesData);
     });
 
     return () => unsubscribe();
+    const sortedNotes = notes 
   }, [user]);
 
   const bg = useColorModeValue('gray.50', 'gray.800'); 
