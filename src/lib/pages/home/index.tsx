@@ -7,15 +7,12 @@ import SignIn from '~/lib/components/SignIn';
 import { Welcome } from '~/lib/components/Welcome';
 import Countdown from '~/lib/components/Countdown';
 import Notes from '~/lib/components/Notes'; 
+import ClockIn from '~/lib/components/ClockIn';
 import { useAuth } from '~/lib/contexts/AuthContext';
 
 const Home = () => {
   const { user } = useAuth();
   const [currentView, setCurrentView] = useState('welcome');
-
-  const isDesktop = () => {
-    return window.innerWidth > 1024 && !/Mobi|Android/i.test(navigator.userAgent);
-  };
 
   const variants = {
     initial: { opacity: 0, y: 20 }, 
@@ -26,10 +23,12 @@ const Home = () => {
   const swipeRight = () => {
     if (currentView === 'welcome') setCurrentView('countdown');
     else if (currentView === 'countdown') setCurrentView('notes');
+    else if (currentView === 'notes') setCurrentView('clockIn'); 
   };
 
   const swipeLeft = () => {
-    if (currentView === 'notes') setCurrentView('countdown');
+    if (currentView === 'clockIn') setCurrentView('notes');
+    else if (currentView === 'notes') setCurrentView('countdown');
     else if (currentView === 'countdown') setCurrentView('welcome');
   };
 
@@ -60,7 +59,7 @@ const Home = () => {
   const footerHeight = '40px'; 
 
   const showLeftOverlay = currentView !== 'welcome';
-  const showRightOverlay = currentView !== 'notes';
+  const showRightOverlay = currentView !== 'clockIn';
 
   return (
     <Flex
@@ -73,7 +72,7 @@ const Home = () => {
       w="full"
       position="relative"
     >
-      {isDesktop() && (
+    
         <>
           {showLeftOverlay && (
             <Box
@@ -100,7 +99,7 @@ const Home = () => {
             />
           )}
         </>
-      )}
+     
       {/* Main content */}
       {!user ? (
         <SignIn />
@@ -116,8 +115,10 @@ const Home = () => {
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
           >
-            {currentView === 'welcome' ? <Welcome /> : 
-             currentView === 'countdown' ? <Countdown /> : <Notes />}
+             {currentView === 'welcome' ? <Welcome /> : 
+             currentView === 'countdown' ? <Countdown /> : 
+             currentView === 'notes' ? <Notes /> : 
+             <ClockIn />}
           </motion.div>
         </AnimatePresence>
       )}
