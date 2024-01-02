@@ -125,7 +125,7 @@ const Countdown = () => {
   
  
   return (
-    <VStack spacing={4} align="stretch">
+    <VStack spacing={4} align="stretch" position="relative" zIndex={20}>
       {tasks.length > 0 ? (
         tasks.map((item) => {
           const timeLeft = calculateTimeLeft(item.dueDate);
@@ -143,7 +143,6 @@ const Countdown = () => {
               onPointerDown={() => handlePressStart(item.id)} 
               onPointerUp={handlePressEnd} 
               onPointerLeave={handlePressEnd} 
-              zIndex={20}
             >
               <Text fontSize="lg" fontWeight="bold" mb={1}>
                 {item.name}

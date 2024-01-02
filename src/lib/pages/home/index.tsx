@@ -12,7 +12,12 @@ import { useAuth } from '~/lib/contexts/AuthContext';
 
 const Home = () => {
   const { user } = useAuth();
-  const [currentView, setCurrentView] = useState('welcome');
+
+  const [currentView, setCurrentView] = useState(user ? 'welcome' : 'SignIn');
+
+  useEffect(() => {
+    setCurrentView(user ? 'welcome' : 'SignIn');
+  }, [user]);
 
   const variants = {
     initial: { opacity: 0, y: 20 }, 
@@ -21,15 +26,19 @@ const Home = () => {
   };
 
   const swipeRight = () => {
-    if (currentView === 'welcome') setCurrentView('countdown');
-    else if (currentView === 'countdown') setCurrentView('notes');
-    else if (currentView === 'notes') setCurrentView('clockIn'); 
+    const viewOrder = ['SignIn', 'welcome', 'countdown', 'notes', 'clockIn'];
+    const currentIndex = viewOrder.indexOf(currentView);
+    if (currentIndex < viewOrder.length - 1) {
+      setCurrentView(viewOrder[currentIndex + 1]);
+    }
   };
 
   const swipeLeft = () => {
-    if (currentView === 'clockIn') setCurrentView('notes');
-    else if (currentView === 'notes') setCurrentView('countdown');
-    else if (currentView === 'countdown') setCurrentView('welcome');
+    const viewOrder = ['SignIn', 'welcome', 'countdown', 'notes', 'clockIn'];
+    const currentIndex = viewOrder.indexOf(currentView);
+    if (currentIndex > 0) {
+      setCurrentView(viewOrder[currentIndex - 1]);
+    }
   };
 
   const swipeThreshold = 100;
@@ -58,8 +67,8 @@ const Home = () => {
   const headerHeight = '70px'; 
   const footerHeight = '40px'; 
 
-  const showLeftOverlay = currentView !== 'welcome';
-  const showRightOverlay = currentView !== 'clockIn';
+  const showLeftOverlay = currentView !== 'welcome' && currentView !== 'SignIn';
+  const showRightOverlay = currentView !== 'clockIn' && currentView !== 'SignIn';
 
   return (
     <Flex

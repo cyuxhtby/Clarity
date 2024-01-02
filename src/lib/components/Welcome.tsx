@@ -18,8 +18,10 @@ export const Welcome = () => {
       alignItems="center"
       height="100%"
       p={2}
+      position="relative" 
+      zIndex="20"
     >
-      <Box textAlign="center" mb={20} zIndex={20}>
+      <Box textAlign="center" mb={20} >
         <Text fontSize="6xl" fontWeight="bold" mb={2}>
           {day}
         </Text>
@@ -30,7 +32,7 @@ export const Welcome = () => {
           {time}
         </Text>
       </Box>
-      <Box mt={10} zIndex={20}>
+      <Box mt={10}>
         <VStack spacing={4}>
         <AddTask/>
         <AddNote/>

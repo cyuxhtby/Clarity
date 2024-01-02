@@ -75,7 +75,7 @@ const Notes = () => {
   };
 
   return (
-    <VStack spacing={4} align="stretch">
+    <VStack spacing={4} align="stretch" position="relative" zIndex={20}>
       {notes.length > 0 ? (
         notes.map((note) => (
           <Box
@@ -89,8 +89,7 @@ const Notes = () => {
             _hover={{ boxShadow: 'md' }}
             onPointerDown={() => handlePressStart(note.id)} 
             onPointerUp={handlePressEnd} 
-            onPointerLeave={handlePressEnd} 
-            zIndex={20}
+            onPointerLeave={handlePressEnd}
           >
             <Text fontSize="lg" fontWeight={"bold"}>
                 {note.text}
