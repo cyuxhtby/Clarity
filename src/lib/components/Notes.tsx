@@ -75,7 +75,7 @@ const Notes = () => {
   };
 
   return (
-    <VStack spacing={4} align="stretch" position="relative" zIndex={20}>
+    <VStack spacing={4} align="stretch" position="relative" zIndex={20} w="full">
       {notes.length > 0 ? (
         notes.map((note) => (
           <Box
@@ -90,8 +90,9 @@ const Notes = () => {
             onPointerDown={() => handlePressStart(note.id)} 
             onPointerUp={handlePressEnd} 
             onPointerLeave={handlePressEnd}
+            wordBreak="break-word" 
           >
-            <Text fontSize="lg" fontWeight={"bold"}>
+            <Text  fontSize={{ base: "md", md: "lg" }} fontWeight={"bold"}>
                 {note.text}
             </Text>
             {note.link && (
