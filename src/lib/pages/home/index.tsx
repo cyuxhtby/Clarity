@@ -9,6 +9,7 @@ import Countdown from '~/lib/components/Countdown';
 import Notes from '~/lib/components/Notes'; 
 import ClockIn from '~/lib/components/ClockIn';
 import { useAuth } from '~/lib/contexts/AuthContext';
+import ActivityPlanner from '~/lib/components/ActivityPlanner';
 
 const Home = () => {
   const { user } = useAuth();
@@ -25,8 +26,9 @@ const Home = () => {
     exit: { opacity: 0, y: -30, transition: { duration: 0.7, ease: "easeInOut" } }, 
   };
 
+  const viewOrder = ['SignIn', 'welcome', 'countdown', 'notes', 'activityPlanner', 'clockIn'];
+
   const swipeRight = () => {
-    const viewOrder = ['SignIn', 'welcome', 'countdown', 'notes', 'clockIn'];
     const currentIndex = viewOrder.indexOf(currentView);
     if (currentIndex < viewOrder.length - 1) {
       setCurrentView(viewOrder[currentIndex + 1]);
@@ -34,7 +36,6 @@ const Home = () => {
   };
 
   const swipeLeft = () => {
-    const viewOrder = ['SignIn', 'welcome', 'countdown', 'notes', 'clockIn'];
     const currentIndex = viewOrder.indexOf(currentView);
     if (currentIndex > 0) {
       setCurrentView(viewOrder[currentIndex - 1]);
@@ -124,10 +125,12 @@ const Home = () => {
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
           >
-             {currentView === 'welcome' ? <Welcome /> : 
-             currentView === 'countdown' ? <Countdown /> : 
-             currentView === 'notes' ? <Notes /> : 
-             <ClockIn />}
+             {currentView === 'welcome' && <Welcome />}
+             {currentView === 'countdown' && <Countdown />}
+             {currentView === 'notes' && <Notes />}
+             {currentView === 'clockIn' && <ClockIn />}
+             {currentView === 'activityPlanner' && <ActivityPlanner />} 
+            
           </motion.div>
         </AnimatePresence>
       )}
