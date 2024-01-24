@@ -26,7 +26,7 @@ const Home = () => {
     exit: { opacity: 0, y: -30, transition: { duration: 0.7, ease: "easeInOut" } }, 
   };
 
-  const viewOrder = ['SignIn', 'welcome', 'countdown', 'notes', 'activityPlanner', 'clockIn'];
+  const viewOrder = ['welcome', 'countdown', 'notes', 'activityPlanner', 'clockIn'];
 
   const swipeRight = () => {
     const currentIndex = viewOrder.indexOf(currentView);
@@ -47,7 +47,9 @@ const Home = () => {
   const handleSwipe = (event: any, info: any) => {
     const offset = info.offset.x;
     if (offset > swipeThreshold) {
-      swipeLeft();
+      if (currentView !== 'welcome') {
+        swipeLeft();
+      }
     } else if (offset < -swipeThreshold) {
       swipeRight();
     }
