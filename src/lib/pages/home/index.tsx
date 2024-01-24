@@ -10,11 +10,13 @@ import Notes from '~/lib/components/Notes';
 import ClockIn from '~/lib/components/ClockIn';
 import { useAuth } from '~/lib/contexts/AuthContext';
 import ActivityPlanner from '~/lib/components/ActivityPlanner';
+import { useView } from '~/lib/contexts/ViewContext';
+
 
 const Home = () => {
   const { user } = useAuth();
 
-  const [currentView, setCurrentView] = useState(user ? 'welcome' : 'SignIn');
+  const { currentView, setCurrentView } = useView();
 
   useEffect(() => {
     setCurrentView(user ? 'welcome' : 'SignIn');
