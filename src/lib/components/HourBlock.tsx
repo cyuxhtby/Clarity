@@ -10,11 +10,13 @@ interface HourBlockProps {
 
 const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity, deleteActivity }) => {
   const [currentActivity, setCurrentActivity] = useState(activity);
+  const [isEditing, setIsEditing] = useState(!activity);
   const bg = useColorModeValue('gray.50', 'gray.700');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     setCurrentActivity(activity);
+    setIsEditing(!activity);
   }, [activity]);
 
   useEffect(() => {
@@ -30,15 +32,20 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity
   const handleSave = () => {
     if (currentActivity.trim() !== '') {
       saveActivity(hour, currentActivity);
+      setIsEditing(false);
     }
   };
 
   const handleDelete = () => {
     deleteActivity(hour);
+    setCurrentActivity(''); 
+    setIsEditing(true);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCurrentActivity(e.target.value);
+    // Set isEditing to true as soon as the user modifies the text
+    setIsEditing(true);
   };
 
   return (
@@ -59,10 +66,11 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity
         />
       </Box>
       <Button
-        onClick={activity ? handleDelete : handleSave}
+        onClick={isEditing ? handleSave : handleDelete}
         size="sm"
+        borderRadius="md"
       >
-        {activity ? '-' : '+'}
+        {isEditing ? '+' : '-'}
       </Button>
     </HStack>
   );
