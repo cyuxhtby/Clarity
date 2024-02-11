@@ -1,6 +1,25 @@
+'use client'
+
+import { useEffect, useState } from 'react';
+
 const APP_NAME = 'nextarter-chakra';
 
 const Meta = () => {
+  const [themeColor, setThemeColor] = useState('#FFFFFF'); 
+
+  useEffect(() => {
+    const setTheme = (e: any) => {
+      setThemeColor(e.matches ? '#0F4C81' : '#FFFFFF'); 
+    };
+
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    darkModeMediaQuery.addListener(setTheme);
+    setTheme(darkModeMediaQuery);
+
+    return () => {
+      darkModeMediaQuery.removeListener(setTheme);
+    };
+  }, []);
   return (
     <>
       <meta name="application-name" content={APP_NAME} />
