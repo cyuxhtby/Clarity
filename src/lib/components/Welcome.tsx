@@ -32,7 +32,7 @@ export const Welcome = () => {
           {time}
         </Text>
       </Box>
-      <Box mt={10}>
+      <Box mt={5}>
         <VStack spacing={4}>
         <AddTask/>
         <AddNote/>

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 const APP_NAME = 'nextarter-chakra';
 
 const Meta = () => {
-  const [themeColor, setThemeColor] = useState('#FFFFFF'); 
+  const [themeColor, setThemeColor] = useState('#0F4C81'); 
 
   useEffect(() => {
     const setTheme = (e: any) => {
