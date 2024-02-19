@@ -10,7 +10,7 @@ const Footer = () => {
   const total = viewOrder.length;
 
   return (
-    <Flex as="footer" width="full" justifyContent="center" position="relative" paddingBottom="4">
+    <Flex as="footer" width="full" justifyContent="center" position="fixed" bottom="0" left="0" right="0" paddingBottom="4" marginTop="10" zIndex="10" backdropFilter="blur(30px)">
       {user && currentView !== 'signin' && <SwipeIndicator currentIndex={currentIndex} total={total} />}
       <Text fontSize="sm"></Text>
     </Flex>

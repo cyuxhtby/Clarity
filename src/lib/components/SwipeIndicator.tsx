@@ -20,6 +20,7 @@ const SwipeIndicator = ({ currentIndex, total }: { currentIndex: number; total: 
           marginX="1"
           cursor="pointer"
           onClick={() => handleDotClick(index)}
+          marginTop="12px"
         />
       ))}
     </Box>
