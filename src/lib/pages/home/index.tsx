@@ -9,13 +9,13 @@ import SignIn from '~/lib/components/SignIn';
 import Welcome from '~/lib/components/Welcome';
 import Countdown from '~/lib/components/Countdown';
 import Notes from '~/lib/components/Notes';
-import ClockIn from '~/lib/components/ClockIn';
+import Checklist from '~/lib/components/Checklist';
 import ActivityPlanner from '~/lib/components/ActivityPlanner';
 
 const Home = () => {
   const { user } = useAuth();
   const { currentView, setCurrentView, viewOrder } = useView();
-  const viewComponents = [ Welcome, Countdown, Notes, ActivityPlanner, ClockIn];
+  const viewComponents = [ Welcome, Countdown, Notes, ActivityPlanner, Checklist];
   const viewIndex = viewOrder.indexOf(currentView);
 
   useEffect(() => {
