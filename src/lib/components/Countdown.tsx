@@ -9,7 +9,7 @@ import { useAuth } from '~/lib/contexts/AuthContext';
 import DeleteItem from '~/lib/components/modals/DeleteItem';
 
 
-interface Task {
+interface Event {
   id: string;
   name: string;
   dueDate: Timestamp;
@@ -24,7 +24,7 @@ interface TimeLeft {
   
 
 const Countdown = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Event[]>([]);
   const { user } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -37,7 +37,7 @@ const Countdown = () => {
     }
   
     const userDocRef = doc(db, "users", user.uid);
-    const tasksCollectionRef = collection(userDocRef, "tasks");
+    const tasksCollectionRef = collection(userDocRef, "events");
     const q = tasksCollectionRef; 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let tasksData = querySnapshot.docs.map(doc => {

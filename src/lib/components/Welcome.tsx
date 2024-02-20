@@ -1,6 +1,6 @@
 import React from 'react';
 import { VStack, Text, Button, Box } from '@chakra-ui/react';
-import AddTask from '~/lib/components/modals/AddTask'
+import AddEvent from '~/lib/components/modals/AddEvent'
 import AddNote from './modals/AddNote';
 
 export const Welcome = () => {
@@ -34,7 +34,7 @@ export const Welcome = () => {
       </Box>
       <Box mt={5}>
         <VStack spacing={4}>
-        <AddTask/>
+        <AddEvent/>
         <AddNote/>
         </VStack>
       </Box>

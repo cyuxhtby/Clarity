@@ -11,17 +11,19 @@ import {
   FormLabel,
   Input,
   useDisclosure,
-  useColorModeValue
+  useColorModeValue,
+  useToast
 } from '@chakra-ui/react';
 import { collection, addDoc, doc, Timestamp} from "firebase/firestore";
 import { firestore as db} from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 
-const AddTask = () => {
+const AddEvent = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [itemName, setItemName] = useState('');
   const [itemDateTime, setItemDateTime] = useState('');
   const { user } = useAuth();
+  const toast = useToast();
 
   const bg = useColorModeValue('rgba(255, 255, 255, 0.8)', 'rgba(26, 32, 44, 0.8)'); 
   const backdropFilter = useColorModeValue('blur(10px)', 'blur(15px)'); 
@@ -35,25 +37,31 @@ const AddTask = () => {
       return;
     }
     if (!user) {
-      console.error("User must be logged in to add tasks");
+      console.error("User must be logged in to add events");
       return;
     }
   
     try {
       const userDocRef = doc(db, "users", user.uid); 
-      const tasksCollectionRef = collection(userDocRef, "tasks"); 
+      const eventsCollectionRef = collection(userDocRef, "events"); 
       const itemDateTimestamp = Timestamp.fromDate(new Date(itemDateTime)); 
-      const taskDoc = {
+      const eventDoc = {
         name: itemName,
         dueDate: itemDateTimestamp,
         createdAt: Timestamp.fromDate(new Date())
       };
   
-      const docRef = await addDoc(tasksCollectionRef, taskDoc);
+      const docRef = await addDoc(eventsCollectionRef, eventDoc);
   
       setItemName('');
       setItemDateTime('');
       onClose(); 
+
+      toast({
+        title: "Event added",
+        status: "success",
+        duration: 1000
+      });
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -63,7 +71,7 @@ const AddTask = () => {
   return (
     <>
       <Button onClick={onOpen} colorScheme={colorScheme} size="lg">
-        Add Task
+        Add Event
       </Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -110,4 +118,4 @@ const AddTask = () => {
   );
 };
 
-export default AddTask;
+export default AddEvent;
