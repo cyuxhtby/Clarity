@@ -125,7 +125,7 @@ const Countdown = () => {
   
  
   return (
-    <VStack spacing={4} align="stretch" position="relative" zIndex={20}>
+    <VStack spacing={4} align="stretch" position="relative" zIndex={20} minHeight="400px" alignItems="center" justifyContent="center">
       {tasks.length > 0 ? (
         tasks.map((item) => {
           const timeLeft = calculateTimeLeft(item.dueDate);
@@ -165,7 +165,7 @@ const Countdown = () => {
           );
         })
       ) : (
-        <Text fontSize="lg" fontWeight="bold">Your tasks will show here</Text>
+        <Text fontSize="lg" fontWeight="bold">Your events will show here</Text>
       )}
 
       

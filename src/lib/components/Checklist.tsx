@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { VStack, Checkbox, Button, Input, useToast, Flex } from '@chakra-ui/react';
-import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import {
+  VStack,
+  Checkbox,
+  Button,
+  Input,
+  useToast,
+  Flex,
+  Box,
+} from '@chakra-ui/react';
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 
@@ -11,11 +25,11 @@ interface Task {
 }
 
 const Checklist = () => {
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [newTaskTitle, setNewTaskTitle] = useState('');
-    const inputRef = useRef<HTMLInputElement>(null); // useRef for the input element
-    const { user } = useAuth();
-    const toast = useToast();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const checklistRef = useRef<HTMLDivElement>(null); 
+  const { user } = useAuth();
+  const toast = useToast();
 
   useEffect(() => {
     if (user) {
@@ -24,15 +38,15 @@ const Checklist = () => {
   }, [user]);
 
   useEffect(() => {
-    const adjustInputHeight = () => {
-      if (inputRef.current) {
-        inputRef.current.style.height = 'auto'; 
-        inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+    const adjustChecklistHeight = () => {
+      if (checklistRef.current) {
+        checklistRef.current.style.minHeight = '0px'; 
+        checklistRef.current.style.minHeight = `${checklistRef.current.scrollHeight}px`;
       }
     };
 
-    adjustInputHeight();
-  }, [newTaskTitle]);
+    adjustChecklistHeight();
+  }, [tasks]);
 
   const fetchTasks = async () => {
     const tasksRef = collection(db, 'users', user.uid, 'tasks');
@@ -68,44 +82,42 @@ const Checklist = () => {
   };
 
   return (
-    <Flex
-      direction="column"
+    <VStack
+      ref={checklistRef}
       align="stretch"
-      justify="flex-start"
-      flex="1" 
-      overflow="visible"
+      spacing={4}
+      width="100%"
+      overflowY="auto"
+      minHeight={400}
+      justifyContent="center"
+      zIndex={20}
     >
       {tasks.map((task) => (
         <Flex key={task.id} justify="center" width="100%">
-          <Checkbox
-            size="lg"
-            isChecked={task.completed}
-            onChange={() => removeTask(task.id)}
-          >
-            {task.title}
-          </Checkbox>
+          <Flex justify="flex-start" align="center" width="auto">
+            <Checkbox
+              size="lg"
+              isChecked={task.completed}
+              onChange={() => removeTask(task.id)}
+            >
+              {task.title}
+            </Checkbox>
+          </Flex>
         </Flex>
       ))}
-
       <Flex justify="center" width="100%" mt="auto">
         <Input
-          ref={inputRef}
           placeholder="Add new task"
           value={newTaskTitle}
           onChange={(e) => setNewTaskTitle(e.target.value)}
           size="lg"
-          overflowY="hidden"
+          overflowY={'visible'}
         />
-        <Button
-          borderRadius="md"
-          onClick={addTask}
-          ml={2}
-          size="lg"
-        >
+        <Button borderRadius="md" onClick={addTask} ml={2} size="lg">
           +
         </Button>
       </Flex>
-    </Flex>
+    </VStack>
   );
 };
 

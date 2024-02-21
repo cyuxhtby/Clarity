@@ -14,6 +14,7 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  useToast
 } from '@chakra-ui/react';
 import { FaLink } from "react-icons/fa";
 import { collection, addDoc, doc, Timestamp } from "firebase/firestore";
@@ -25,6 +26,8 @@ const AddNote = () => {
   const [noteText, setNoteText] = useState('');
   const [link, setLink] = useState('');
   const { user } = useAuth();
+  const toast = useToast();
+
 
   const bg = useColorModeValue('rgba(255, 255, 255, 0.8)', 'rgba(26, 32, 44, 0.8)');
   const backdropFilter = useColorModeValue('blur(10px)', 'blur(15px)');
@@ -56,6 +59,12 @@ const AddNote = () => {
       setNoteText('');
       setLink(''); 
       onClose();
+
+      toast({
+        title: "Note added",
+        status: "success",
+        duration: 1000
+      });
     } catch (error) {
       console.error("Error adding document: ", error);
     }

@@ -75,7 +75,15 @@ const Notes = () => {
   };
 
   return (
-    <VStack spacing={4} align="stretch" position="relative" zIndex={20} w="full">
+    <VStack
+      spacing={4}
+      align="stretch"
+      position="relative"
+      zIndex={20}
+      w="full"
+      minHeight={400}
+      justifyContent="center"
+    >
       {notes.length > 0 ? (
         notes.map((note) => (
           <Box
@@ -87,23 +95,32 @@ const Notes = () => {
             borderRadius="md"
             boxShadow="sm"
             _hover={{ boxShadow: 'md' }}
-            onPointerDown={() => handlePressStart(note.id)} 
-            onPointerUp={handlePressEnd} 
+            onPointerDown={() => handlePressStart(note.id)}
+            onPointerUp={handlePressEnd}
             onPointerLeave={handlePressEnd}
-            wordBreak="break-word" 
+            wordBreak="break-word"
           >
-            <Text  fontSize={{ base: "md", md: "lg" }} fontWeight={"bold"}>
-                {note.text}
+            <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight={'bold'}>
+              {note.text}
             </Text>
             {note.link && (
               <Link href={note.link} isExternal color="teal.500">
                 {note.link}
-            </Link>
+              </Link>
             )}
           </Box>
         ))
       ) : (
-        <Text fontSize="lg" fontWeight="bold">Your notes will show here</Text>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          height="100%"
+        >
+          <Text fontSize="lg" fontWeight="bold">
+            Your notes will show here
+          </Text>
+        </Box>
       )}
 
       <DeleteItem
