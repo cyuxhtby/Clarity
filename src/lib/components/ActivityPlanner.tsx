@@ -83,7 +83,7 @@ const ActivityPlanner: React.FC = () => {
       
       
   
-    const hours = Array.from({ length: 15 }, (_, i) => `${i + 6}:00`);
+    const hours = Array.from({ length: 17 }, (_, i) => `${i + 6}:00`);
   
     return (
         <VStack width="full" borderRadius="md" spacing={4} zIndex={20} position="relative">
