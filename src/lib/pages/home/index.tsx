@@ -30,6 +30,20 @@ const Home = () => {
   const swipeLeft = () => viewIndex > 0 && handleSwipeChangeIndex(viewIndex - 1);
   const swipeRight = () => viewIndex < viewComponents.length - 1 && handleSwipeChangeIndex(viewIndex + 1);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        swipeLeft();
+      } else if (event.key === 'ArrowRight') {
+        swipeRight();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [user, setCurrentView, swipeLeft, swipeRight]);
+  
   return (
     <Flex
       direction="column"
