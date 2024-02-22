@@ -31,8 +31,9 @@ const DeleteItem: React.FC<DeleteItemProps> = ({ isOpen, onConfirm, onCancel }) 
         my={20}
         p={6}
         boxShadow="xl"
+        alignItems="center"
       >
-        <ModalHeader alignContent="center">Done with this?</ModalHeader>
+        <ModalHeader>Done with this?</ModalHeader>
         <ModalFooter justifyContent="center">
           <Button colorScheme={colorScheme} px={5} mr={2} onClick={onConfirm}>
             Yes

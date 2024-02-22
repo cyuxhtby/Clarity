@@ -24,7 +24,7 @@ interface TimeLeft {
   
 
 const Countdown = () => {
-  const [tasks, setTasks] = useState<Event[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const { user } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -37,10 +37,10 @@ const Countdown = () => {
     }
   
     const userDocRef = doc(db, "users", user.uid);
-    const tasksCollectionRef = collection(userDocRef, "events");
-    const q = tasksCollectionRef; 
+    const eventsCollectionRef = collection(userDocRef, "events");
+    const q = eventsCollectionRef; 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let tasksData = querySnapshot.docs.map(doc => {
+      let eventsData = querySnapshot.docs.map(doc => {
         const docData = doc.data();
         return {
           id: doc.id,
@@ -49,8 +49,8 @@ const Countdown = () => {
         };
       });
       
-      tasksData.sort((a, b) => a.dueDate.toDate() - b.dueDate.toDate());
-      setTasks(tasksData);
+      eventsData.sort((a, b) => a.dueDate.toDate() - b.dueDate.toDate());
+      setEvents(eventsData);
     });
 
     return () => unsubscribe();
@@ -59,7 +59,7 @@ const Countdown = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTasks(currentItems => {
+      setEvents(currentItems => {
         return currentItems.map(item => {
           return { ...item }; // Trigger re-render by creating a new object
         });
@@ -112,11 +112,11 @@ const Countdown = () => {
 
   const handleDeleteConfirm = async () => {
     if (selectedItemId && user) {
-      const taskDocRef = doc(db, "users", user.uid, "tasks", selectedItemId);
+      const eventDocRef = doc(db, "users", user.uid, "events", selectedItemId);
       try {
-        await deleteDoc(taskDocRef);
+        await deleteDoc(eventDocRef);
       } catch (error) {
-        console.error("Error deleting task: ", error);
+        console.error("Error deleting event: ", error);
       }
       setSelectedItemId(null);
       onClose();
@@ -126,8 +126,8 @@ const Countdown = () => {
  
   return (
     <VStack spacing={4} align="stretch" position="relative" zIndex={20} minHeight="400px" alignItems="center" justifyContent="center">
-      {tasks.length > 0 ? (
-        tasks.map((item) => {
+      {events.length > 0 ? (
+        events.map((item) => {
           const timeLeft = calculateTimeLeft(item.dueDate);
           const isOverdue = new Date(item.dueDate.toDate()).getTime() < new Date().getTime();
           return (
@@ -142,7 +142,8 @@ const Countdown = () => {
               _hover={{ boxShadow: 'md' }}
               onPointerDown={() => handlePressStart(item.id)} 
               onPointerUp={handlePressEnd} 
-              onPointerLeave={handlePressEnd} 
+              onPointerLeave={handlePressEnd}
+              userSelect="none"
             >
               <Text fontSize="lg" fontWeight="bold" mb={1}>
                 {item.name}

@@ -99,6 +99,7 @@ const Notes = () => {
             onPointerUp={handlePressEnd}
             onPointerLeave={handlePressEnd}
             wordBreak="break-word"
+            userSelect="none"
           >
             <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight={'bold'}>
               {note.text}
