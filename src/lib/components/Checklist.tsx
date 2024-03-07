@@ -53,7 +53,7 @@ const Checklist = () => {
     const querySnapshot = await getDocs(tasksRef);
     const tasksData = querySnapshot.docs
       .map((doc) => ({ id: doc.id, ...doc.data() }) as Task)
-      .reverse();
+      .sort((a, b) => a.title.length - b.title.length)
     setTasks(tasksData);
   };
 
@@ -94,7 +94,7 @@ const Checklist = () => {
     >
       {tasks.map((task) => (
         <Flex key={task.id} justify="center" width="100%">
-          <Flex justify="flex-start" align="center" width="auto">
+          <Flex justify="flex-start" align="center" width="400px">
             <Checkbox
               size="lg"
               isChecked={task.completed}
@@ -110,6 +110,11 @@ const Checklist = () => {
           placeholder="Add new task"
           value={newTaskTitle}
           onChange={(e) => setNewTaskTitle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              addTask();
+            }
+          }}
           size="lg"
           overflowY={'visible'}
         />
