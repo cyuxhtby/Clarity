@@ -56,7 +56,7 @@ const Home = () => {
       position="relative"
     >
       {/* Clickable overlays */}
-      {viewIndex !== 0 && (
+      {user && viewIndex !== 0 && (
         <Box
           position="fixed"
           left={0}
@@ -68,7 +68,7 @@ const Home = () => {
           zIndex="0"
         />
       )}
-      {viewIndex !== viewComponents.length - 1 && (
+      {user && viewIndex !== viewComponents.length - 1 && (
         <Box
           position="fixed"
           right={0}
