@@ -34,7 +34,7 @@ const Notes = () => {
         link: doc.data().link,
         createdAt: doc.data().createdAt,
       }));
-      const sortedNotesData = notesData.sort((a, b) => a.createdAt - b.createdAt)
+      const sortedNotesData = notesData.sort((a, b) => b.createdAt - a.createdAt)
       setNotes(sortedNotesData);
     });
 
