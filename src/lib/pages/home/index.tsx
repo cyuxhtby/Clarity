@@ -15,7 +15,7 @@ import ActivityPlanner from '~/lib/components/ActivityPlanner';
 const Home = () => {
   const { user } = useAuth();
   const { currentView, setCurrentView, viewOrder } = useView();
-  const viewComponents = [ Welcome, Countdown, Notes, ActivityPlanner, Checklist];
+  const viewComponents = [ Welcome, Countdown, Checklist, Notes, ActivityPlanner];
   const viewIndex = viewOrder.indexOf(currentView);
 
   useEffect(() => {
