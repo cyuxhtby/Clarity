@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
+import AddTask from './modals/AddTask';
 
 interface Task {
   id: string;
@@ -105,23 +106,7 @@ const Checklist = () => {
           </Flex>
         </Flex>
       ))}
-      <Flex justify="center" width="100%" mt="auto">
-        <Input
-          placeholder="Add new task"
-          value={newTaskTitle}
-          onChange={(e) => setNewTaskTitle(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              addTask();
-            }
-          }}
-          size="lg"
-          overflowY={'visible'}
-        />
-        <Button borderRadius="md" onClick={addTask} ml={2} size="lg">
-          +
-        </Button>
-      </Flex>
+      <AddTask onTaskAdded={fetchTasks}/>
     </VStack>
   );
 };
