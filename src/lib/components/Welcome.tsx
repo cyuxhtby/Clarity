@@ -1,7 +1,9 @@
 import React from 'react';
-import { VStack, Text, Button, Box } from '@chakra-ui/react';
+import { VStack, Text, Button, Box, Grid } from '@chakra-ui/react';
 import AddEvent from '~/lib/components/modals/AddEvent'
 import AddNote from './modals/AddNote';
+import AddTask from './modals/AddTask';
+import AddLog from './modals/AddLog';
 import { useBreakpointValue } from "@chakra-ui/react";
 
 export const Welcome = () => {
@@ -23,7 +25,7 @@ export const Welcome = () => {
       position="relative" 
       zIndex="20"
     >
-      <Box textAlign="center" mb={20} >
+      <Box textAlign="center" mb={16} >
         <Text fontSize={dayFontSize} fontWeight="bold" mb={2}>
           {day}
         </Text>
@@ -34,11 +36,13 @@ export const Welcome = () => {
           {time}
         </Text>
       </Box>
-      <Box mt={5}>
-        <VStack spacing={4}>
+      <Box mt={2}>
+      <Grid templateColumns="repeat(2, 1fr)" gap={3}>
         <AddEvent/>
         <AddNote/>
-        </VStack>
+        <AddTask/>
+        <AddLog/>
+        </Grid>
       </Box>
     </VStack>
   );
