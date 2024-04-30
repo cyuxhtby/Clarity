@@ -80,7 +80,7 @@ const Checklist = () => {
     <VStack
       ref={checklistRef}
       align="stretch"
-      spacing={3}
+      spacing={2}
       width="100%"
       overflowY="auto"
       minHeight={400}
@@ -89,7 +89,7 @@ const Checklist = () => {
     >
       {tasks.map((task) => (
        <Flex key={task.id} justify="center" width="100%">
-          <Box width="400px"  borderRadius="lg" padding="2" paddingLeft="8px" paddingRight="8px" backgroundColor={"blackAlpha.200"}>
+          <Box width="400px"  borderRadius="lg" padding="2" paddingLeft="8px" paddingRight="8px" backgroundColor={"blackAlpha.400"}>
             <Checkbox
               size="lg"
               isChecked={task.completed}

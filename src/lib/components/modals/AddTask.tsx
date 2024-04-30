@@ -85,7 +85,6 @@ const AddTask: React.FC<AddTaskProps> = ({ onTaskAdded, view = 'default' }) => {
       </Button>
     ) : (
       <>
-          <Box/>
           <Button onClick={onOpen} height="40px" width="40px" borderRadius="lg" colorScheme={colorScheme} m="auto">
           <Icon as={FaPlus}/>
         </Button>
