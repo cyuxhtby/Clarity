@@ -100,7 +100,6 @@ const Checklist = () => {
           </Box>
         </Flex>
       ))}
-      <AddTask onTaskAdded={fetchTasks} view={'plus'}/>
     </VStack>
   );
 };
