@@ -3,8 +3,6 @@ import { VStack, Checkbox, Button, Input, useToast, Flex, Box, useColorModeValue
 import { collection, addDoc, getDocs, deleteDoc, doc, setDoc, updateDoc, onSnapshot} from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
-import AddTask from './modals/AddTask';
-import { color } from 'framer-motion';
 
 interface Task {
   id: string;
@@ -107,6 +105,12 @@ const Checklist = () => {
           </Box>
         </Flex>
       ))}
+      {/* spacing to not get cut off by footer */}
+      {tasks.length > 8 ? (
+          <Box height={10} />
+      ) : (
+          <Box height={0} />
+      )}
     </VStack>
   );
 };
