@@ -43,28 +43,6 @@ const Checklist = () => {
     setTasks(tasksData);
   };
 
-  // const addTask = async () => {
-  //   if (!newTaskTitle.trim()) {
-  //     toast({
-  //       title: 'Please enter a task.',
-  //       status: 'warning',
-  //       duration: 2000,
-  //     });
-  //     return;
-  //   }
-  //   await addDoc(collection(db, 'users', user.uid, 'tasks'), {
-  //     title: newTaskTitle,
-  //     completed: false,
-  //   });
-  //   setNewTaskTitle('');
-  //   toast({
-  //     title: 'Task added',
-  //     status: 'success',
-  //     duration: 1000,
-  //   });
-  //   fetchTasks();
-  // };
-
   const removeTask = async (task: Task) => {
     const taskDocRef = doc(db, 'users', user.uid, 'tasks', task.id);
     await updateDoc(taskDocRef, { completed: true });
@@ -102,7 +80,7 @@ const Checklist = () => {
     <VStack
       ref={checklistRef}
       align="stretch"
-      spacing={4}
+      spacing={3}
       width="100%"
       overflowY="auto"
       minHeight={400}
@@ -110,8 +88,8 @@ const Checklist = () => {
       zIndex={20}
     >
       {tasks.map((task) => (
-        <Flex key={task.id} justify="center" width="100%">
-          <Flex justify="flex-start" align="center" width="400px">
+       <Flex key={task.id} justify="center" width="100%">
+          <Box width="400px"  borderRadius="lg" padding="2" paddingLeft="8px" paddingRight="8px" backgroundColor={"blackAlpha.200"}>
             <Checkbox
               size="lg"
               isChecked={task.completed}
@@ -119,10 +97,10 @@ const Checklist = () => {
             >
               {task.title}
             </Checkbox>
-          </Flex>
+          </Box>
         </Flex>
       ))}
-      <AddTask onTaskAdded={fetchTasks}/>
+      <AddTask onTaskAdded={fetchTasks} view={'plus'}/>
     </VStack>
   );
 };

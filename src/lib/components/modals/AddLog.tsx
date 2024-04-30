@@ -73,7 +73,7 @@ const AddLog = ({ onlogAdded }: { onlogAdded?: () => void }) => {
 
   return (
     <>
-      <Button onClick={onOpen} colorScheme={colorScheme} size="lg">
+      <Button onClick={onOpen} colorScheme={colorScheme} size="md" height="45px">
         Add Log
       </Button>
 

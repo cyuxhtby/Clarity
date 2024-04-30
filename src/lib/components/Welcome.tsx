@@ -25,7 +25,7 @@ export const Welcome = () => {
       position="relative" 
       zIndex="20"
     >
-      <Box textAlign="center" mb={16} >
+      <Box textAlign="center" mb={10} >
         <Text fontSize={dayFontSize} fontWeight="bold" mb={2}>
           {day}
         </Text>
@@ -39,8 +39,8 @@ export const Welcome = () => {
       <Box mt={2}>
       <Grid templateColumns="repeat(2, 1fr)" gap={3}>
         <AddEvent/>
-        <AddNote/>
         <AddTask/>
+        <AddNote/>
         <AddLog/>
         </Grid>
       </Box>

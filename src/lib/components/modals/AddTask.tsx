@@ -12,13 +12,21 @@ import {
   Input,
   useDisclosure,
   useColorModeValue,
-  useToast
+  useToast,
+  Icon,
+  Box
 } from '@chakra-ui/react';
+import { FaPlus } from "react-icons/fa6";
 import { collection, addDoc, doc, Timestamp} from "firebase/firestore";
 import { firestore as db} from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 
-const AddTask = ({ onTaskAdded }: { onTaskAdded?: () => void}) => {
+interface AddTaskProps {
+  onTaskAdded?: () => void;
+  view?: 'default' | 'plus';
+}
+
+const AddTask: React.FC<AddTaskProps> = ({ onTaskAdded, view = 'default' }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [taskName, setTaskName] = useState('');
   const [taskLink, setTaskLink] = useState('');
@@ -71,11 +79,19 @@ const AddTask = ({ onTaskAdded }: { onTaskAdded?: () => void}) => {
 
   return (
     <>
-      <Button onClick={onOpen} colorScheme={colorScheme} size="lg">
+    {view === 'default' ? (
+      <Button onClick={onOpen} colorScheme={colorScheme} size="md" height="45px" >
         Add Task
       </Button>
-
-      <Modal isOpen={isOpen} onClose={onClose}>
+    ) : (
+      <>
+          <Box/>
+          <Button onClick={onOpen} height="40px" width="40px" borderRadius="lg" colorScheme={colorScheme} m="auto">
+          <Icon as={FaPlus}/>
+        </Button>
+      </>
+    )}
+    <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent
           bg={bg}
