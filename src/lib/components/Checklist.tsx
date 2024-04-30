@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { VStack, Checkbox, Button, Input, useToast, Flex, Box, useColorModeValue, Text} from '@chakra-ui/react';
-import { collection, addDoc, getDocs, deleteDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc, setDoc, updateDoc, onSnapshot} from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 import AddTask from './modals/AddTask';
@@ -23,28 +23,17 @@ const Checklist = () => {
 
   useEffect(() => {
     if (user) {
-      fetchTasks();
+      const tasksRef = collection(db, 'users', user.uid, 'tasks');
+      const unsubscribe = onSnapshot(tasksRef, (querySnapshot) => {
+        const tasksData = querySnapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }) as Task)
+          .sort((a, b) => a.title.length - b.title.length);
+        setTasks(tasksData);
+      });
+
+      return () => unsubscribe();
     }
   }, [user]);
-
-  useEffect(() => {
-    const adjustChecklistHeight = () => {
-      if (checklistRef.current) {
-        checklistRef.current.style.minHeight = '0px';
-        checklistRef.current.style.minHeight = `${checklistRef.current.scrollHeight}px`;
-      }
-    };
-    adjustChecklistHeight();
-  }, [tasks]);
-
-  const fetchTasks = async () => {
-    const tasksRef = collection(db, 'users', user.uid, 'tasks');
-    const querySnapshot = await getDocs(tasksRef);
-    const tasksData = querySnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }) as Task)
-      .sort((a, b) => a.title.length - b.title.length);
-    setTasks(tasksData);
-  };
 
   const removeTask = async (task: Task) => {
     const taskDocRef = doc(db, 'users', user.uid, 'tasks', task.id);
@@ -68,7 +57,6 @@ const Checklist = () => {
                 title: task.title,
                 completed: false,
               });
-              fetchTasks();
               toast.close(toastId);
             }}
           >

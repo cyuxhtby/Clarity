@@ -21,12 +21,7 @@ import { collection, addDoc, doc, Timestamp} from "firebase/firestore";
 import { firestore as db} from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 
-interface AddTaskProps {
-  onTaskAdded?: () => void;
-  view?: 'default' | 'plus';
-}
-
-const AddTask: React.FC<AddTaskProps> = ({ onTaskAdded, view = 'default' }) => {
+const AddTask: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [taskName, setTaskName] = useState('');
   const [taskLink, setTaskLink] = useState('');
@@ -39,7 +34,6 @@ const AddTask: React.FC<AddTaskProps> = ({ onTaskAdded, view = 'default' }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!taskName.trim()) {
       console.error("A task is required");
       return;
@@ -48,29 +42,15 @@ const AddTask: React.FC<AddTaskProps> = ({ onTaskAdded, view = 'default' }) => {
       console.error("User must be logged in to add tasks");
       return;
     }
-  
     try {
-      const userDocRef = doc(db, "users", user.uid); 
-      const taskCollectionRef = collection(userDocRef, "tasks"); 
-      const taskDoc = {
-        title: taskName,
-        completed: false
-      };
-  
+      const userDocRef = doc(db, "users", user.uid);
+      const taskCollectionRef = collection(userDocRef, "tasks");
+      const taskDoc = { title: taskName, completed: false };
       const docRef = await addDoc(taskCollectionRef, taskDoc);
-  
       setTaskName('');
       setTaskLink('');
-      onClose(); 
-
-      toast({
-        title: "Task added",
-        status: "success",
-        duration: 1000
-      });
-      if(onTaskAdded){
-        onTaskAdded();
-      }
+      onClose();
+      toast({ title: "Task added", status: "success", duration: 1000 });
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -79,17 +59,9 @@ const AddTask: React.FC<AddTaskProps> = ({ onTaskAdded, view = 'default' }) => {
 
   return (
     <>
-    {view === 'default' ? (
-      <Button onClick={onOpen} colorScheme={colorScheme} size="md" height="45px" >
+    <Button onClick={onOpen} colorScheme={colorScheme} size="md" height="45px" >
         Add Task
       </Button>
-    ) : (
-      <>
-          <Button onClick={onOpen} height="40px" width="40px" borderRadius="lg" colorScheme={colorScheme} m="auto">
-          <Icon as={FaPlus}/>
-        </Button>
-      </>
-    )}
     <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent
