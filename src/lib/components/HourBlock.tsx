@@ -11,8 +11,17 @@ interface HourBlockProps {
 const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity, deleteActivity }) => {
   const [currentActivity, setCurrentActivity] = useState(activity);
   const [isEditing, setIsEditing] = useState(!activity);
-  const bg = useColorModeValue('gray.50', 'gray.700');
+  const bg = useColorModeValue('gray.200', 'gray.700');
+  const passedBg = useColorModeValue('gray.50', 'gray.900');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const [isPassed, setIsPassed] = useState(false);
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    const blockHour = parseInt(hour.split(':')[0]);
+    setIsPassed(blockHour < currentHour);
+  }, [hour]);
 
   useEffect(() => {
     setCurrentActivity(activity);
@@ -38,20 +47,21 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity
 
   const handleDelete = () => {
     deleteActivity(hour);
-    setCurrentActivity(''); 
+    setCurrentActivity('');
     setIsEditing(true);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCurrentActivity(e.target.value);
-    // Set isEditing to true as soon as the user modifies the text
     setIsEditing(true);
   };
 
   return (
-    <HStack w="100%" bg={bg} p={4} borderWidth="1px" borderRadius="lg" spacing={4} alignItems="center">
+    <HStack w="100%" bg={isPassed ? passedBg : bg} p={4} borderWidth="1px" borderRadius="lg" spacing={4} alignItems="center">
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Text fontSize="md" fontWeight="medium">{hour}</Text>
+        <Text fontSize="md" fontWeight="medium" color={isPassed ? 'gray.500' : 'inherit'}>
+          {hour}
+        </Text>
       </Box>
       <Box flex="1">
         <Textarea
@@ -60,16 +70,13 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity
           value={currentActivity}
           onChange={handleChange}
           resize="none"
-          height="20px" 
-          minHeight="20px" 
-          overflowY="hidden" 
+          height="20px"
+          minHeight="20px"
+          overflowY="hidden"
+          color={isPassed ? 'gray.500' : 'inherit'}
         />
       </Box>
-      <Button
-        onClick={isEditing ? handleSave : handleDelete}
-        size="sm"
-        borderRadius="md"
-      >
+      <Button onClick={isEditing ? handleSave : handleDelete} size="sm" borderRadius="md">
         {isEditing ? '+' : '-'}
       </Button>
     </HStack>
