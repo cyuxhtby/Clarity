@@ -81,7 +81,7 @@ const ActivityPlanner: React.FC = () => {
     }
   };
 
-  const hours = Array.from({ length: 19 }, (_, i) => `${i + 6}:00`);
+  const hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`);
 
   return (
     <>
