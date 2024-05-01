@@ -14,13 +14,19 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity
   const bg = useColorModeValue('gray.200', 'gray.700');
   const passedBg = useColorModeValue('gray.50', 'gray.900');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
   const [isPassed, setIsPassed] = useState(false);
 
   useEffect(() => {
-    const currentHour = new Date().getHours();
-    const blockHour = parseInt(hour.split(':')[0]);
-    setIsPassed(blockHour < currentHour);
+    const updateIsPassed = () => {
+      const currentHour = new Date().getHours();
+      const blockHour = parseInt(hour.split(':')[0]);
+      setIsPassed(blockHour < currentHour);
+    };
+    updateIsPassed(); 
+    const timer = setInterval(updateIsPassed, 120000); 
+    return () => {
+      clearInterval(timer); 
+    };
   }, [hour]);
 
   useEffect(() => {
