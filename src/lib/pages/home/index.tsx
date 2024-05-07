@@ -15,7 +15,7 @@ import ActivityPlanner from '~/lib/components/ActivityPlanner';
 const Home = () => {
   const { user } = useAuth();
   const { currentView, setCurrentView, viewOrder } = useView();
-  const viewComponents = [ Welcome, Countdown, Checklist, ActivityPlanner, Notes];
+  const viewComponents = [ActivityPlanner, Welcome, Countdown, Checklist, Notes];
   const viewIndex = viewOrder.indexOf(currentView);
 
   useEffect(() => {
@@ -93,7 +93,7 @@ const Home = () => {
           >
             {viewComponents.map((Component, i) => (
               <Box key={i} w="full" h="auto">
-                <Component />
+                <Component/>
               </Box>
             ))}
           </SwipeableViews>
@@ -104,4 +104,3 @@ const Home = () => {
 };
 
 export default Home;
-
