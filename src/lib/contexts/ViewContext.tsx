@@ -20,7 +20,7 @@ export const useView = () => {
 export const ViewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [currentView, setCurrentView] = useState(user ? 'welcome' : 'SignIn');
-  const viewOrder = ['activityPlanner', 'welcome', 'countdown','checklist', 'notes'];
+  const viewOrder = ['activityPlanner', 'welcome', 'countdown','checklist', 'notes', 'logs'];
 
   return (
     <ViewContext.Provider value={{ currentView, setCurrentView, viewOrder }}>
