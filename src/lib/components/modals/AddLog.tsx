@@ -6,6 +6,7 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
+  ModalCloseButton,
   Button,
   FormControl,
   Textarea,
@@ -19,15 +20,13 @@ import { collection, addDoc, doc } from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 
-const AddLog = ({ onlogAdded }: { onlogAdded?: () => void }) => {
+const AddLog = ({ onLogAdded }: { onLogAdded?: () => void }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [logText, setLogText] = useState('');
   const { user } = useAuth();
   const toast = useToast();
-  const bg = useColorModeValue('rgba(255, 255, 255, 0.8)', 'rgba(26, 32, 44, 0.8)');
-  const backdropFilter = useColorModeValue('blur(10px)', 'blur(15px)');
+  const bg = useColorModeValue('white', 'gray.800');
   const colorScheme = useColorModeValue('blue', 'blue');
-
   const [dateTimeString, setDateTimeString] = useState('');
 
   useEffect(() => {
@@ -77,8 +76,8 @@ const AddLog = ({ onlogAdded }: { onlogAdded?: () => void }) => {
         status: 'success',
         duration: 1000,
       });
-      if (onlogAdded) {
-        onlogAdded();
+      if (onLogAdded) {
+        onLogAdded();
       }
     } catch (error) {
       console.error('Error adding document: ', error);
@@ -90,36 +89,33 @@ const AddLog = ({ onlogAdded }: { onlogAdded?: () => void }) => {
       <Button onClick={onOpen} colorScheme={colorScheme} size="md" height="45px">
         Add Log
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} size="full">
         <ModalOverlay />
-        <ModalContent bg={bg} backdropFilter={backdropFilter} borderRadius="xl" mx={4} my={40} p={6} boxShadow="xl">
-          <ModalHeader>
-            <Box
-              borderRadius="lg"
-              p={4}
-              textAlign="left"
-              boxShadow="md"
-            >
+        <ModalContent bg={bg} borderRadius="none" m={0} p={0} boxShadow="none">
+          <ModalHeader p={4} borderBottomWidth={1} borderBottomColor="gray.200">
+            <Box display="flex" alignItems="center" justifyContent="space-between">
               <Text fontSize="lg" fontWeight="bold">
                 {dateTimeString}
               </Text>
+              <ModalCloseButton />
             </Box>
           </ModalHeader>
           <form onSubmit={handleSubmit}>
-            <ModalBody>
+            <ModalBody p={4}>
               <FormControl>
                 <Textarea
                   value={logText}
                   onChange={(e) => setLogText(e.target.value)}
-                  minHeight="250px"
+                  minHeight="calc(100vh - 200px)"
                   placeholder="Write your log here..."
-                  borderRadius="md"
-                  boxShadow="md"
+                  borderRadius="none"
+                  boxShadow="none"
+                  _focus={{ boxShadow: 'none' }}
                 />
               </FormControl>
             </ModalBody>
-            <ModalFooter justifyContent="center">
-              <Button colorScheme={colorScheme} type="submit" px={8}>
+            <ModalFooter p={4} borderTopWidth={1} borderTopColor="gray.200">
+              <Button colorScheme={colorScheme} type="submit" ml="auto">
                 Add
               </Button>
             </ModalFooter>
