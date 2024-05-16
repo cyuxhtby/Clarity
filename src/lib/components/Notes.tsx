@@ -1,76 +1,105 @@
 import React, { useEffect, useState } from 'react';
-import { VStack, Text, Box, useColorModeValue, useDisclosure, Link } from '@chakra-ui/react';
+import {
+  VStack,
+  Text,
+  Box,
+  useColorModeValue,
+  Link,
+  Image,
+  Flex,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { collection, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 import DeleteItem from '~/lib/components/modals/DeleteItem';
+import NoteModal from '~/lib/components/modals/NoteModal';
 
 interface Note {
   id: string;
   text: string;
-  link?: string; 
-  createdAt: any; 
+  link?: string;
+  imageUrl?: string;
+  createdAt: any;
 }
 
 const Notes = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const { user } = useAuth();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  const [pressTimer, setPressTimer] = useState<number | null>(null); 
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: onDeleteModalOpen,
+    onClose: onDeleteModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isNoteModalOpen,
+    onOpen: onNoteModalOpen,
+    onClose: onNoteModalClose,
+  } = useDisclosure();
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [pressTimer, setPressTimer] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user) {
-      console.log("User not logged in");
+      console.log('User not logged in');
       return;
     }
 
-    const userDocRef = doc(db, "users", user.uid);
-    const notesCollectionRef = collection(userDocRef, "notes");
+    const userDocRef = doc(db, 'users', user.uid);
+    const notesCollectionRef = collection(userDocRef, 'notes');
     const unsubscribe = onSnapshot(notesCollectionRef, (querySnapshot) => {
-      const notesData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        text: doc.data().text,
-        link: doc.data().link,
-        createdAt: doc.data().createdAt,
-      }));
-      const sortedNotesData = notesData.sort((a, b) => b.createdAt - a.createdAt)
-      setNotes(sortedNotesData);
+      const notesData = querySnapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          text: doc.data().text,
+          link: doc.data().link,
+          imageUrl: doc.data().imageUrl,
+          createdAt: doc.data().createdAt,
+        }))
+        .sort((a, b) => b.createdAt - a.createdAt);
+      setNotes(notesData);
     });
 
     return () => unsubscribe();
-    const sortedNotes = notes 
   }, [user]);
 
-  const bg = useColorModeValue('gray.50', 'gray.800'); 
-  const color = useColorModeValue('gray.900', 'white'); 
+  const bg = useColorModeValue('gray.50', 'gray.800');
+  const color = useColorModeValue('gray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
+  const handleImageClick = (note: Note) => {
+    setSelectedNote(note);
+    onNoteModalOpen();
+  };
+
   const handlePressStart = (noteId: string) => {
-    const timer = window.setTimeout(() => { 
-      setSelectedNoteId(noteId);
-      onOpen();
-    }, 800) as number; 
-    setPressTimer(timer);
+    const timer = setTimeout(() => {
+      const note = notes.find((n) => n.id === noteId);
+      if (note && !note.imageUrl) {
+        setSelectedNote(note);
+        onDeleteModalOpen();
+      }
+    }, 800);
+    setPressTimer(timer as unknown as number);
   };
 
   const handlePressEnd = () => {
     if (pressTimer !== null) {
-      clearTimeout(pressTimer); 
+      clearTimeout(pressTimer);
       setPressTimer(null);
     }
   };
 
   const handleDeleteNote = async () => {
-    if (selectedNoteId && user) {
-      const noteDocRef = doc(db, "users", user.uid, "notes", selectedNoteId);
+    if (selectedNote && user) {
+      const noteDocRef = doc(db, 'users', user.uid, 'notes', selectedNote.id);
       try {
         await deleteDoc(noteDocRef);
+        setSelectedNote(null);
+        onDeleteModalClose();
       } catch (error) {
-        console.error("Error deleting note: ", error);
+        console.error('Error deleting note: ', error);
       }
-      setSelectedNoteId(null);
-      onClose();
     }
   };
 
@@ -86,7 +115,7 @@ const Notes = () => {
     >
       {notes.length > 0 ? (
         notes.map((note) => (
-          <Box
+          <Flex
             key={note.id}
             p={4}
             bg={bg}
@@ -100,16 +129,31 @@ const Notes = () => {
             onPointerLeave={handlePressEnd}
             wordBreak="break-word"
             userSelect="none"
+            align="center"
+            justify="space-between"
           >
-            <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight={'bold'}>
-              {note.text}
-            </Text>
-            {note.link && (
-              <Link href={note.link} isExternal color="teal.500">
-                {note.link}
-              </Link>
+            <Box flex="1" mr={4}>
+              <Text fontSize={{ base: 'md', md: 'lg' }} fontWeight={'bold'}>
+                {note.text}
+              </Text>
+              {note.link && (
+                <Link href={note.link} isExternal color="teal.500">
+                  {note.link}
+                </Link>
+              )}
+            </Box>
+            {note.imageUrl && (
+              <Image
+                src={note.imageUrl}
+                alt="Note Thumbnail"
+                boxSize="60px"
+                objectFit="cover"
+                borderRadius="md"
+                onClick={() => handleImageClick(note)}
+                cursor="pointer"
+              />
             )}
-          </Box>
+          </Flex>
         ))
       ) : (
         <Box
@@ -124,14 +168,26 @@ const Notes = () => {
         </Box>
       )}
 
-      <DeleteItem
-        isOpen={isOpen}
-        onConfirm={handleDeleteNote}
-        onCancel={() => {
-          setSelectedNoteId(null);
-          onClose();
-        }}
-      />
+      {selectedNote && (
+        <>
+          <DeleteItem
+            isOpen={isDeleteModalOpen}
+            onConfirm={handleDeleteNote}
+            onCancel={() => {
+              setSelectedNote(null);
+              onDeleteModalClose();
+            }}
+          />
+          <NoteModal
+            isOpen={isNoteModalOpen}
+            onClose={() => {
+              setSelectedNote(null);
+              onNoteModalClose();
+            }}
+            note={selectedNote}
+          />
+        </>
+      )}
     </VStack>
   );
 };
