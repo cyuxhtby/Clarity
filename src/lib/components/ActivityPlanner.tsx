@@ -1,106 +1,117 @@
 import React, { useState, useEffect } from 'react';
-import { VStack, useColorModeValue, Box, Text } from '@chakra-ui/react';
-import { collection, addDoc, deleteDoc, doc, getDocs, setDoc } from "firebase/firestore";
+import { VStack, Text, Box } from '@chakra-ui/react';
+import { collection, getDocs, doc } from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 import HourBlock from './HourBlock';
+import { DndContext, DragEndEvent } from '@dnd-kit/core';
 
-interface Activities {
-  [hour: string]: string;
+interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+  order: number;
 }
 
 const ActivityPlanner: React.FC = () => {
-  const [activities, setActivities] = useState<Activities>({});
   const { user } = useAuth();
-  const bg = useColorModeValue('gray.50', 'gray.700');
-
-
-  const fetchActivities = async () => {
-    if (!user) return;
-
-    try {
-      console.log("Fetching activities for user:", user.uid);
-      const userDocRef = doc(db, "users", user.uid);
-      const activitiesCollectionRef = collection(userDocRef, "activities");
-      const activitiesSnapshot = await getDocs(activitiesCollectionRef);
-      const activitiesData: Activities = {};
-      activitiesSnapshot.forEach((docSnapshot) => {
-        activitiesData[docSnapshot.id] = docSnapshot.data().text;
-      });
-      setActivities(activitiesData);
-    } catch (error) {
-    }
-  };
+  const [activities, setActivities] = useState<Record<string, Task[]>>({});
 
   useEffect(() => {
+    const fetchActivities = async () => {
+      if (!user) return;
+
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const activitiesCollectionRef = collection(userDocRef, 'activities');
+        const activitiesSnapshot = await getDocs(activitiesCollectionRef);
+        const activitiesData: Record<string, Task[]> = {};
+        activitiesSnapshot.forEach((docSnapshot) => {
+          const data = docSnapshot.data();
+          activitiesData[docSnapshot.id] = data.tasks;
+        });
+        setActivities(activitiesData);
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+      }
+    };
+
     fetchActivities();
   }, [user]);
 
-
-  const saveActivity = async (hour: string, activityText: string) => {
-    if (!user || activityText.trim() === '') {
-      return;
-    }
-
-    const userDocRef = doc(db, "users", user.uid);
-    const activityDocRef = doc(collection(userDocRef, "activities"), hour);
-
-    try {
-      await setDoc(activityDocRef, { text: activityText });
-      setActivities((prevActivities) => ({ ...prevActivities, [hour]: activityText }));
-    } catch (error: any) {
-      if ("code" in error && error.code === "permission-denied") {
-        console.error("Firestore permission denied:", error);
-      } else {
-        console.error("Error saving activity:", error);
-      }
-    }
+  const addTask = (hour: string, taskText: string) => {
+    const newTask: Task = { id: `${hour}_${Date.now()}`, title: taskText, completed: false, order: 0 };
+    setActivities((prevActivities) => ({
+      ...prevActivities,
+      [hour]: [...(prevActivities[hour] || []), newTask],
+    }));
   };
 
-  const deleteActivity = async (hour: string) => {
-    if (!user) {
-      console.error("No authenticated user found");
-      return;
-    }
-
-    console.log("Deleting activity for hour:", hour);
-    const userDocRef = doc(db, "users", user.uid);
-    const activityDocRef = doc(collection(userDocRef, "activities"), hour);
-
-    try {
-      await deleteDoc(activityDocRef);
-      console.log("Activity deleted successfully for hour:", hour);
-
-      setActivities((prevActivities) => {
-        const updatedActivities = { ...prevActivities };
-        delete updatedActivities[hour];
-        return updatedActivities;
+  const removeTask = (task: Task) => {
+    setActivities((prevActivities) => {
+      const updatedActivities = { ...prevActivities };
+      Object.keys(updatedActivities).forEach((hour) => {
+        if (updatedActivities[hour]) {
+          updatedActivities[hour] = updatedActivities[hour].filter((t) => t.id !== task.id);
+        }
       });
-    } catch (error: any) {
-      console.error("Error deleting activity:", error);
+      return updatedActivities;
+    });
+  };
+
+  const handleDropTask = (taskId: string, destinationHour: string) => {
+    setActivities((prevActivities) => {
+      const updatedActivities = { ...prevActivities };
+      let movedTask: Task | undefined;
+  
+      Object.keys(updatedActivities).forEach((key) => {
+        if (updatedActivities[key]) {
+          const taskIndex = updatedActivities[key].findIndex((task) => task.id === taskId);
+          if (taskIndex !== -1) {
+            [movedTask] = updatedActivities[key].splice(taskIndex, 1);
+          }
+        }
+      });
+  
+      if (movedTask) {
+        if (!updatedActivities[destinationHour]) {
+          updatedActivities[destinationHour] = [];
+        }
+        updatedActivities[destinationHour].push(movedTask);
+      }
+  
+      return updatedActivities;
+    });
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      handleDropTask(active.id as string, over.id as string);
     }
   };
 
   const hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`);
 
   return (
-    <> 
+    <>
       <Text fontSize="lg" fontWeight="bold" mb={2}>
         Today
       </Text>
-      <VStack width="full" borderRadius="md" spacing={4} zIndex={20} position="relative">
-        {hours.map((hour, index) => (
-          <HourBlock
-            key={index}
-            hour={hour}
-            saveActivity={saveActivity}
-            deleteActivity={deleteActivity}
-            activity={activities[hour]}
-          />
-        ))}
-        {/* spacing to not get cut off by footer */}
-        <Box height={10} />
-      </VStack>
+      <DndContext onDragEnd={handleDragEnd}>
+        <VStack width="full" borderRadius="md" spacing={4} zIndex={20} position="relative">
+          {hours.map((hour) => (
+            <HourBlock
+              key={hour}
+              hour={hour}
+              tasks={activities[hour] || []}
+              addTask={addTask}
+              removeTask={removeTask}
+            />
+          ))}
+          <Box height={10} />
+        </VStack>
+      </DndContext>
     </>
   );
 };

@@ -1,21 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Text, Textarea, Button, HStack, Box, useColorModeValue } from '@chakra-ui/react';
+import React, { useState, useRef, useEffect } from 'react';
+import { HStack, Box, Text, Textarea, useColorModeValue, IconButton, VStack } from '@chakra-ui/react';
+import { MdAdd } from "react-icons/md";
+import TaskItem from './TaskItem';
+import { useDroppable } from '@dnd-kit/core';
+
+interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+  order: number;
+}
 
 interface HourBlockProps {
   hour: string;
-  activity?: string;
-  saveActivity: (hour: string, activity: string) => void;
-  deleteActivity: (hour: string) => void;
+  tasks: Task[];
+  addTask: (hour: string, taskText: string) => void;
+  removeTask: (task: Task) => void;
   isFutureDate?: boolean;
 }
 
-const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity, deleteActivity, isFutureDate = false }) => {
-  const [currentActivity, setCurrentActivity] = useState(activity);
-  const [isEditing, setIsEditing] = useState(!activity);
-  const bg = useColorModeValue('gray.200', 'gray.700');
-  const passedBg = useColorModeValue('gray.50', 'gray.900');
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask, isFutureDate = false }) => {
+  const [newTask, setNewTask] = useState('');
+  const [isAddingTask, setIsAddingTask] = useState(false);
   const [isPassed, setIsPassed] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const bg = useColorModeValue('gray.200', 'gray.700');
+  const isPassedBg = isPassed ? 'blackAlpha.400' : 'grey.800';
+
+
+  useEffect(() => {
+    if (isAddingTask && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isAddingTask]);
 
   useEffect(() => {
     if (!isFutureDate) {
@@ -24,72 +41,90 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity
         const blockHour = parseInt(hour.split(':')[0]);
         setIsPassed(blockHour < currentHour);
       };
+
       updateIsPassed();
       const timer = setInterval(updateIsPassed, 120000);
+
       return () => {
         clearInterval(timer);
       };
+    } else {
+      setIsPassed(false);
     }
   }, [hour, isFutureDate]);
 
-  useEffect(() => {
-    setCurrentActivity(activity);
-    setIsEditing(!activity);
-  }, [activity]);
-
-  useEffect(() => {
-    const adjustHeight = () => {
-      if (textareaRef.current) {
-        textareaRef.current.style.height = '0';
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-      }
-    };
-    adjustHeight();
-  }, [currentActivity]);
-
-  const handleSave = () => {
-    if (currentActivity.trim() !== '') {
-      saveActivity(hour, currentActivity);
-      setIsEditing(false);
+  const handleAddTask = () => {
+    if (newTask.trim() !== '') {
+      addTask(hour, newTask);
+      setNewTask('');
+      setIsAddingTask(false);
     }
   };
 
-  const handleDelete = () => {
-    deleteActivity(hour);
-    setCurrentActivity('');
-    setIsEditing(true);
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleAddTask();
+    }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCurrentActivity(e.target.value);
-    setIsEditing(true);
+  const handleBlur = () => {
+    if (newTask.trim() === '') {
+      setIsAddingTask(false);
+    }
   };
 
-  const formattedHour = hour.split('_')[1];
+  const { isOver, setNodeRef } = useDroppable({
+    id: hour,
+  });
 
   return (
-    <HStack w="100%" bg={isPassed ? passedBg : bg} p={4} borderWidth="1px" borderRadius="lg" spacing={4} alignItems="center">
+    <HStack
+      ref={setNodeRef}
+      w="100%"
+      bg={isPassedBg}
+      p={4}
+      borderWidth="1px"
+      borderRadius="lg"
+      spacing={4}
+      alignItems="center"
+      borderColor="grey.100"
+    >
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Text fontSize="md" fontWeight="medium" color={isPassed ? 'gray.500' : 'inherit'}>
-          {formattedHour}
+        <Text fontSize="md" fontWeight="medium">
+          {hour}
         </Text>
       </Box>
       <Box flex="1">
-        <Textarea
-          ref={textareaRef}
-          placeholder="Add activity..."
-          value={currentActivity}
-          onChange={handleChange}
-          resize="none"
-          height="20px"
-          minHeight="20px"
-          overflowY="hidden"
-          color={isPassed ? 'gray.500' : 'inherit'}
-        />
+        <VStack align="start">
+          {tasks.map((task) => (
+            <TaskItem key={task.id} id={task.id} task={task} removeTask={removeTask} />
+          ))}
+          {isAddingTask && (
+            <Textarea
+              ref={textareaRef}
+              placeholder="Add task..."
+              value={newTask}
+              onChange={(e) => setNewTask(e.target.value)}
+              onKeyPress={handleKeyPress}
+              onBlur={handleBlur}
+              resize="none"
+              height="20px"
+              minHeight="20px"
+              overflowY="hidden"
+            />
+          )}
+        </VStack>
       </Box>
-      <Button onClick={isEditing ? handleSave : handleDelete} size="sm" borderRadius="md">
-        {isEditing ? '+' : '-'}
-      </Button>
+      {!isAddingTask && (
+        <IconButton
+          aria-label="Add task"
+          icon={<MdAdd />}
+          size="sm"
+          borderRadius="md"
+          onClick={() => setIsAddingTask(true)}
+        />
+      )}
     </HStack>
   );
 };

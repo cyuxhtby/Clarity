@@ -1,33 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import {
-  VStack,
-  useColorModeValue,
-  Box,
-  Text,
-  IconButton,
-} from '@chakra-ui/react';
-import {
-  collection,
-  doc,
-  getDocs,
-  setDoc,
-  deleteDoc,
-} from 'firebase/firestore';
+import { VStack, useColorModeValue, Box, Text, IconButton } from '@chakra-ui/react';
+import { collection, doc, getDocs, setDoc, deleteDoc } from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 import { format, addDays, startOfTomorrow } from 'date-fns';
 import { FaChevronCircleDown, FaChevronCircleUp } from 'react-icons/fa';
 import HourBlock from './HourBlock';
 
+interface Activity {
+  text: string;
+  tasks: Task[];
+}
+
 interface Activities {
-  [key: string]: string;
+  [key: string]: Activity;
+}
+
+interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+  order: number;
 }
 
 const ActivityPlannerWeekly: React.FC = () => {
   const [activities, setActivities] = useState<Activities>({});
-  const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>(
-    {}
-  );
+  const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>({});
   const { user } = useAuth();
   const bg = useColorModeValue('gray.50', 'gray.700');
 
@@ -41,7 +39,7 @@ const ActivityPlannerWeekly: React.FC = () => {
       const activitiesSnapshot = await getDocs(activitiesCollectionRef);
       const activitiesData: Activities = {};
       activitiesSnapshot.forEach((docSnapshot) => {
-        activitiesData[docSnapshot.id] = docSnapshot.data().text;
+        activitiesData[docSnapshot.id] = docSnapshot.data() as Activity;
       });
       setActivities(activitiesData);
     } catch (error) {
@@ -69,10 +67,10 @@ const ActivityPlannerWeekly: React.FC = () => {
     const activityDocRef = doc(collection(userDocRef, 'activities'), key);
 
     try {
-      await setDoc(activityDocRef, { text: activityText });
+      await setDoc(activityDocRef, { text: activityText, tasks: activities[key]?.tasks || [] });
       setActivities((prevActivities) => ({
         ...prevActivities,
-        [key]: activityText,
+        [key]: { text: activityText, tasks: activities[key]?.tasks || [] },
       }));
     } catch (error) {
       console.error('Error saving activity:', error);
@@ -99,43 +97,85 @@ const ActivityPlannerWeekly: React.FC = () => {
     }
   };
 
+  const addTask = async (key: string, taskText: string) => {
+    if (!user || taskText.trim() === '') {
+      return;
+    }
+
+    const newTask: Task = {
+      id: `${key}_${Date.now()}`,
+      title: taskText,
+      completed: false,
+      order: activities[key]?.tasks?.length || 0,
+    };
+
+    const userDocRef = doc(db, 'users', user.uid);
+    const activityDocRef = doc(collection(userDocRef, 'activities'), key);
+
+    try {
+      await setDoc(activityDocRef, {
+        text: activities[key]?.text || '',
+        tasks: [...(activities[key]?.tasks || []), newTask],
+      });
+      setActivities((prevActivities) => ({
+        ...prevActivities,
+        [key]: {
+          text: prevActivities[key]?.text || '',
+          tasks: [...(prevActivities[key]?.tasks || []), newTask],
+        },
+      }));
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
+  };
+
+  const removeTask = async (key: string, task: Task) => {
+    if (!user) {
+      return;
+    }
+
+    const userDocRef = doc(db, 'users', user.uid);
+    const activityDocRef = doc(collection(userDocRef, 'activities'), key);
+
+    try {
+      await setDoc(activityDocRef, {
+        text: activities[key]?.text || '',
+        tasks: activities[key]?.tasks?.filter((t) => t.id !== task.id) || [],
+      });
+      setActivities((prevActivities) => ({
+        ...prevActivities,
+        [key]: {
+          text: prevActivities[key]?.text || '',
+          tasks: prevActivities[key]?.tasks?.filter((t) => t.id !== task.id) || [],
+        },
+      }));
+    } catch (error) {
+      console.error('Error removing task:', error);
+    }
+  };
+
   const hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`);
-  const days = Array.from({ length: 7 }, (_, i) =>
-    addDays(startOfTomorrow(), i)
-  );
+  const days = Array.from({ length: 7 }, (_, i) => addDays(startOfTomorrow(), i));
 
   return (
-    <VStack
-      width="full"
-      borderRadius="md"
-      spacing={4}
-      zIndex={20}
-      position="relative"
-      p={4}
-    >
+    <VStack width="full" borderRadius="md" spacing={4} zIndex={20} position="relative" p={4}>
       {days.map((day, dayIndex) => {
         const dayKey = format(day, 'yyyy-MM-dd');
         const dayActivities = Object.keys(activities)
           .filter((key) => key.startsWith(dayKey))
-          .map((key) => ({ time: key.split('_')[1], text: activities[key] }));
+          .map((key) => ({ time: key.split('_')[1], ...activities[key] }));
 
         const isExpanded = expandedDays[dayKey];
 
         return (
           <Box key={dayIndex} width="full" mb={4}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
+            <Box display="flex" justifyContent="space-between" alignItems="center">
               <Text fontSize="lg" fontWeight="bold" mt={4} mb={2}>
                 {format(day, 'EEEE MMMM d')}
               </Text>
               <IconButton
                 aria-label={isExpanded ? 'Collapse' : 'Expand'}
-                icon={
-                  isExpanded ? <FaChevronCircleUp /> : <FaChevronCircleDown />
-                }
+                icon={isExpanded ? <FaChevronCircleUp /> : <FaChevronCircleDown />}
                 onClick={() => toggleExpandDay(dayKey)}
                 size="sm"
               />
@@ -143,32 +183,22 @@ const ActivityPlannerWeekly: React.FC = () => {
             {isExpanded ? (
               hours.map((hour, hourIndex) => {
                 const key = `${dayKey}_${hour}`;
+                const activity = activities[key];
                 return (
-                    <Box mb={2}>
+                  <Box mb={2} key={`${dayIndex}_${hourIndex}`}>
                     <HourBlock
-                    key={`${dayIndex}_${hourIndex}`}
-                    hour={key}
-                    saveActivity={(hour, activity) =>
-                      saveActivity(`${dayKey}_${hour}`, activity)
-                    }
-                    deleteActivity={(hour) =>
-                      deleteActivity(`${dayKey}_${hour}`)
-                    }
-                    activity={activities[key]}
-                    isFutureDate={true}
-                  />
+                      hour={key}
+                      tasks={activity?.tasks || []}
+                      addTask={(taskText) => addTask(key, taskText)}
+                      removeTask={(task) => removeTask(key, task)}
+                      isFutureDate={true}
+                    />
                   </Box>
                 );
               })
             ) : dayActivities.length > 0 ? (
               dayActivities.map((activity, index) => (
-                <Box
-                  key={index}
-                  p={2}
-                  borderWidth="1px"
-                  borderRadius="md"
-                  mt={2}
-                >
+                <Box key={index} p={2} borderWidth="1px" borderRadius="md" mt={2}>
                   <Text>{activity.time}</Text>
                   <Text>{activity.text}</Text>
                 </Box>
