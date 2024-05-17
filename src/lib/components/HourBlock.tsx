@@ -6,9 +6,10 @@ interface HourBlockProps {
   activity?: string;
   saveActivity: (hour: string, activity: string) => void;
   deleteActivity: (hour: string) => void;
+  isFutureDate?: boolean;
 }
 
-const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity, deleteActivity }) => {
+const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity, deleteActivity, isFutureDate = false }) => {
   const [currentActivity, setCurrentActivity] = useState(activity);
   const [isEditing, setIsEditing] = useState(!activity);
   const bg = useColorModeValue('gray.200', 'gray.700');
@@ -17,17 +18,19 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity
   const [isPassed, setIsPassed] = useState(false);
 
   useEffect(() => {
-    const updateIsPassed = () => {
-      const currentHour = new Date().getHours();
-      const blockHour = parseInt(hour.split(':')[0]);
-      setIsPassed(blockHour < currentHour);
-    };
-    updateIsPassed(); 
-    const timer = setInterval(updateIsPassed, 120000); 
-    return () => {
-      clearInterval(timer); 
-    };
-  }, [hour]);
+    if (!isFutureDate) {
+      const updateIsPassed = () => {
+        const currentHour = new Date().getHours();
+        const blockHour = parseInt(hour.split(':')[0]);
+        setIsPassed(blockHour < currentHour);
+      };
+      updateIsPassed();
+      const timer = setInterval(updateIsPassed, 120000);
+      return () => {
+        clearInterval(timer);
+      };
+    }
+  }, [hour, isFutureDate]);
 
   useEffect(() => {
     setCurrentActivity(activity);
@@ -62,11 +65,13 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, activity = '', saveActivity
     setIsEditing(true);
   };
 
+  const formattedHour = hour.split('_')[1];
+
   return (
     <HStack w="100%" bg={isPassed ? passedBg : bg} p={4} borderWidth="1px" borderRadius="lg" spacing={4} alignItems="center">
       <Box display="flex" justifyContent="center" alignItems="center">
         <Text fontSize="md" fontWeight="medium" color={isPassed ? 'gray.500' : 'inherit'}>
-          {hour}
+          {formattedHour}
         </Text>
       </Box>
       <Box flex="1">

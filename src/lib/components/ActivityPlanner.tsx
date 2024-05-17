@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { VStack, useColorModeValue, Box } from '@chakra-ui/react';
+import { VStack, useColorModeValue, Box, Text } from '@chakra-ui/react';
 import { collection, addDoc, deleteDoc, doc, getDocs, setDoc } from "firebase/firestore";
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
@@ -84,7 +84,10 @@ const ActivityPlanner: React.FC = () => {
   const hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`);
 
   return (
-    <>
+    <> 
+      <Text fontSize="lg" fontWeight="bold" mb={2}>
+        Today
+      </Text>
       <VStack width="full" borderRadius="md" spacing={4} zIndex={20} position="relative">
         {hours.map((hour, index) => (
           <HourBlock
