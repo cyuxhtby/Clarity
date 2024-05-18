@@ -25,8 +25,8 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
   const [isPassed, setIsPassed] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const bg = useColorModeValue('gray.200', 'gray.700');
-  const isPassedBg = isPassed ? 'blackAlpha.400' : 'grey.800';
-
+  const isPassedBg = isPassed ? useColorModeValue('gray.200', 'gray.900') : 'blackAlpha.50';
+  const borderColor = useColorModeValue('whiteAlpha.50', 'white');
 
   useEffect(() => {
     if (isAddingTask && textareaRef.current) {
@@ -58,6 +58,8 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
       addTask(hour, newTask);
       setNewTask('');
       setIsAddingTask(false);
+    } else {
+      setIsAddingTask(false);
     }
   };
 
@@ -69,9 +71,7 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
   };
 
   const handleBlur = () => {
-    if (newTask.trim() === '') {
-      setIsAddingTask(false);
-    }
+    handleAddTask();
   };
 
   const { isOver, setNodeRef } = useDroppable({
@@ -88,30 +88,30 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
       borderRadius="lg"
       spacing={4}
       alignItems="center"
-      borderColor="grey.100"
+      borderColor={isOver ? borderColor : 'whiteAlpha.50'}
+      overflow="hidden"
     >
-      <Box display="flex" justifyContent="center" alignItems="center">
+      <Box display="flex" justifyContent="center" alignItems="center" flexShrink={0}>
         <Text fontSize="md" fontWeight="medium">
           {hour}
         </Text>
       </Box>
-      <Box flex="1">
-        <VStack align="start">
+      <Box flex="1" overflow="hidden">
+        <VStack align="start" w="100%">
           {tasks.map((task) => (
             <TaskItem key={task.id} id={task.id} task={task} removeTask={removeTask} />
           ))}
           {isAddingTask && (
             <Textarea
               ref={textareaRef}
-              placeholder="Add task..."
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
               onKeyPress={handleKeyPress}
               onBlur={handleBlur}
               resize="none"
-              height="20px"
               minHeight="20px"
               overflowY="hidden"
+              w="100%"
             />
           )}
         </VStack>
