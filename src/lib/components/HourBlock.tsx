@@ -19,9 +19,10 @@ interface HourBlockProps {
   addTask: (hour: string, taskText: string) => void;
   removeTask: (task: Task) => void;
   assignTaskTime: (taskId: string, date: string, hour: string) => void;
+  isFutureDate?: boolean;
 }
 
-const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask, assignTaskTime }) => {
+const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask, assignTaskTime, isFutureDate }) => {
   const [newTask, setNewTask] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -96,7 +97,7 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
           {tasks.map((task) => (
             <TaskItem key={task.id} id={task.id} task={task} removeTask={removeTask} assignTaskTime={assignTaskTime} />
           ))}
-          {isAddingTask && (
+          {isAddingTask && !isFutureDate && (
             <Textarea
               ref={textareaRef}
               value={newTask}

@@ -7,48 +7,36 @@ import { format, addDays, startOfTomorrow } from 'date-fns';
 import { FaChevronCircleDown, FaChevronCircleUp } from 'react-icons/fa';
 import HourBlock from './HourBlock';
 
-interface Activity {
-  text: string;
-  tasks: Task[];
-}
-
-interface Activities {
-  [key: string]: Activity;
-}
-
 interface Task {
   id: string;
   title: string;
   completed: boolean;
   order: number;
+  date?: string;
+  hour?: string;
 }
 
 const WeeklyPlanner: React.FC = () => {
-  const [activities, setActivities] = useState<Activities>({});
-  const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>({});
   const { user } = useAuth();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>({});
   const bg = useColorModeValue('gray.50', 'gray.700');
 
-  const fetchActivities = async () => {
+  const fetchTasks = async () => {
     if (!user) return;
 
     try {
-      console.log('Fetching activities for user:', user.uid);
-      const userDocRef = doc(db, 'users', user.uid);
-      const activitiesCollectionRef = collection(userDocRef, 'activities');
-      const activitiesSnapshot = await getDocs(activitiesCollectionRef);
-      const activitiesData: Activities = {};
-      activitiesSnapshot.forEach((docSnapshot) => {
-        activitiesData[docSnapshot.id] = docSnapshot.data() as Activity;
-      });
-      setActivities(activitiesData);
+      const tasksRef = collection(db, 'users', user.uid, 'tasks');
+      const tasksSnapshot = await getDocs(tasksRef);
+      const tasksData: Task[] = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
+      setTasks(tasksData);
     } catch (error) {
-      console.error('Error fetching activities:', error);
+      console.error('Error fetching tasks:', error);
     }
   };
 
   useEffect(() => {
-    fetchActivities();
+    fetchTasks();
   }, [user]);
 
   const toggleExpandDay = (dayKey: string) => {
@@ -58,97 +46,39 @@ const WeeklyPlanner: React.FC = () => {
     }));
   };
 
-  const saveActivity = async (key: string, activityText: string) => {
-    if (!user || activityText.trim() === '') {
-      return;
-    }
-
-    const userDocRef = doc(db, 'users', user.uid);
-    const activityDocRef = doc(collection(userDocRef, 'activities'), key);
-
-    try {
-      await setDoc(activityDocRef, { text: activityText, tasks: activities[key]?.tasks || [] });
-      setActivities((prevActivities) => ({
-        ...prevActivities,
-        [key]: { text: activityText, tasks: activities[key]?.tasks || [] },
-      }));
-    } catch (error) {
-      console.error('Error saving activity:', error);
-    }
-  };
-
-  const deleteActivity = async (key: string) => {
-    if (!user) {
-      return;
-    }
-
-    const userDocRef = doc(db, 'users', user.uid);
-    const activityDocRef = doc(collection(userDocRef, 'activities'), key);
-
-    try {
-      await deleteDoc(activityDocRef);
-      setActivities((prevActivities) => {
-        const updatedActivities = { ...prevActivities };
-        delete updatedActivities[key];
-        return updatedActivities;
-      });
-    } catch (error) {
-      console.error('Error deleting activity:', error);
-    }
-  };
-
   const addTask = async (key: string, taskText: string) => {
-    if (!user || taskText.trim() === '') {
-      return;
-    }
+    if (!user || taskText.trim() === '') return;
 
+    const [date, hour] = key.split('_');
     const newTask: Task = {
       id: `${key}_${Date.now()}`,
       title: taskText,
       completed: false,
-      order: activities[key]?.tasks?.length || 0,
+      order: tasks.filter(task => task.date === date && task.hour === hour).length,
+      date,
+      hour,
     };
 
-    const userDocRef = doc(db, 'users', user.uid);
-    const activityDocRef = doc(collection(userDocRef, 'activities'), key);
+    const taskDocRef = doc(db, 'users', user.uid, 'tasks', newTask.id);
+
+    setTasks((prevTasks) => [...prevTasks, newTask]);
 
     try {
-      await setDoc(activityDocRef, {
-        text: activities[key]?.text || '',
-        tasks: [...(activities[key]?.tasks || []), newTask],
-      });
-      setActivities((prevActivities) => ({
-        ...prevActivities,
-        [key]: {
-          text: prevActivities[key]?.text || '',
-          tasks: [...(prevActivities[key]?.tasks || []), newTask],
-        },
-      }));
+      await setDoc(taskDocRef, newTask);
     } catch (error) {
       console.error('Error adding task:', error);
     }
   };
 
-  const removeTask = async (key: string, task: Task) => {
-    if (!user) {
-      return;
-    }
+  const removeTask = async (task: Task) => {
+    if (!user) return;
 
-    const userDocRef = doc(db, 'users', user.uid);
-    const activityDocRef = doc(collection(userDocRef, 'activities'), key);
+    const taskDocRef = doc(db, 'users', user.uid, 'tasks', task.id);
+
+    setTasks((prevTasks) => prevTasks.filter((t) => t.id !== task.id));
 
     try {
-      await setDoc(activityDocRef, {
-        text: activities[key]?.text || '',
-        tasks: activities[key]?.tasks?.filter((t) => t.id !== task.id) || [],
-      });
-      setActivities((prevActivities) => ({
-        ...prevActivities,
-        [key]: {
-          text: prevActivities[key]?.text || '',
-          tasks: prevActivities[key]?.tasks?.filter((t) => t.id !== task.id) || [],
-        },
-      }));
+      await deleteDoc(taskDocRef);
     } catch (error) {
       console.error('Error removing task:', error);
     }
@@ -161,10 +91,6 @@ const WeeklyPlanner: React.FC = () => {
     <VStack width="full" borderRadius="md" spacing={4} zIndex={20} position="relative" p={4}>
       {days.map((day, dayIndex) => {
         const dayKey = format(day, 'yyyy-MM-dd');
-        const dayActivities = Object.keys(activities)
-          .filter((key) => key.startsWith(dayKey))
-          .map((key) => ({ time: key.split('_')[1], ...activities[key] }));
-
         const isExpanded = expandedDays[dayKey];
 
         return (
@@ -183,26 +109,19 @@ const WeeklyPlanner: React.FC = () => {
             {isExpanded ? (
               hours.map((hour, hourIndex) => {
                 const key = `${dayKey}_${hour}`;
-                const activity = activities[key];
+                const tasksForHour = tasks.filter(task => task.date === dayKey && task.hour === hour);
                 return (
                   <Box mb={2} key={`${dayIndex}_${hourIndex}`}>
                     <HourBlock
-                      hour={key}
-                      tasks={activity?.tasks || []}
+                      hour={hour}
+                      tasks={tasksForHour}
                       addTask={(taskText) => addTask(key, taskText)}
-                      removeTask={(task) => removeTask(key, task)}
-                      isFutureDate={true}
+                      removeTask={removeTask}
+                      assignTaskTime={() => {}}
                     />
                   </Box>
                 );
               })
-            ) : dayActivities.length > 0 ? (
-              dayActivities.map((activity, index) => (
-                <Box key={index} p={2} borderWidth="1px" borderRadius="md" mt={2}>
-                  <Text>{activity.time}</Text>
-                  <Text>{activity.text}</Text>
-                </Box>
-              ))
             ) : (
               <Text mt={2} color="gray.500">
                 No tasks scheduled
