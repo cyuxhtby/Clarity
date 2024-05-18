@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { HStack, Box, Text, Textarea, useColorModeValue, IconButton, VStack } from '@chakra-ui/react';
-import { MdAdd } from "react-icons/md";
+import { HStack, Box, Text, Textarea, useColorModeValue, VStack } from '@chakra-ui/react';
 import TaskItem from './TaskItem';
 import { useDroppable } from '@dnd-kit/core';
+import { useSwipeable } from 'react-swipeable';
 
 interface Task {
   id: string;
@@ -27,6 +27,7 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
   const bg = useColorModeValue('gray.200', 'gray.700');
   const isPassedBg = isPassed ? useColorModeValue('gray.200', 'gray.900') : 'blackAlpha.50';
   const borderColor = useColorModeValue('whiteAlpha.50', 'white');
+  const [isSwiping, setIsSwiping] = useState(false);
 
   useEffect(() => {
     if (isAddingTask && textareaRef.current) {
@@ -78,8 +79,20 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
     id: hour,
   });
 
+  const handleClick = () => {
+    if (!isSwiping && !isAddingTask) {
+      setIsAddingTask(true);
+    }
+  };
+
+  const swipeHandlers = useSwipeable({
+    onSwiping: () => setIsSwiping(true),
+    onSwiped: () => setIsSwiping(false),
+  });
+
   return (
     <HStack
+      {...swipeHandlers}
       ref={setNodeRef}
       w="100%"
       bg={isPassedBg}
@@ -90,6 +103,7 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
       alignItems="center"
       borderColor={isOver ? borderColor : 'whiteAlpha.50'}
       overflow="hidden"
+      onClick={handleClick}
     >
       <Box display="flex" justifyContent="center" alignItems="center" flexShrink={0}>
         <Text fontSize="md" fontWeight="medium">
@@ -116,15 +130,6 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
           )}
         </VStack>
       </Box>
-      {!isAddingTask && (
-        <IconButton
-          aria-label="Add task"
-          icon={<MdAdd />}
-          size="sm"
-          borderRadius="md"
-          onClick={() => setIsAddingTask(true)}
-        />
-      )}
     </HStack>
   );
 };
