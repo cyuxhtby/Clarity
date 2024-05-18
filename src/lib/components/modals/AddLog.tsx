@@ -41,9 +41,7 @@ const AddLog = ({ onLogAdded }: { onLogAdded?: () => void }) => {
         minute: 'numeric',
         timeZoneName: 'short',
       };
-      const [weekday, date, time, timezone] = now.toLocaleString('en-US', options).split(', ');
-      const formattedDateTime = `${weekday} ${date} ${time} ${timezone}`;
-      setDateTimeString(formattedDateTime);
+      setDateTimeString(new Intl.DateTimeFormat('en-US', options).format(now));
     };
 
     updateDateTime();
@@ -91,31 +89,31 @@ const AddLog = ({ onLogAdded }: { onLogAdded?: () => void }) => {
       </Button>
       <Modal isOpen={isOpen} onClose={onClose} size="full">
         <ModalOverlay />
-        <ModalContent bg={bg} borderRadius="none" m={0} p={0} boxShadow="none">
-          <ModalHeader p={4} borderBottomWidth={1} borderBottomColor="gray.200">
+        <ModalContent bg={bg} borderRadius="md" boxShadow="lg">
+          <ModalHeader paddingTop={10} paddingBottom={0}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Text fontSize="lg" fontWeight="bold">
                 {dateTimeString}
               </Text>
-              <ModalCloseButton />
+              <ModalCloseButton size="xlg" margin="20px" marginTop={30} />
             </Box>
           </ModalHeader>
           <form onSubmit={handleSubmit}>
-            <ModalBody p={4}>
+            <ModalBody paddingTop={4} paddingBottom={8}>
               <FormControl>
                 <Textarea
                   value={logText}
                   onChange={(e) => setLogText(e.target.value)}
-                  minHeight="calc(100vh - 200px)"
-                  placeholder="Write your log here..."
-                  borderRadius="none"
+                  minHeight="calc(100vh - 200px)"                  
+                  placeholder="A log entry here..."
+                  borderRadius="md"
                   boxShadow="none"
                   _focus={{ boxShadow: 'none' }}
                 />
               </FormControl>
             </ModalBody>
-            <ModalFooter p={4} borderTopWidth={1} borderTopColor="gray.200">
-              <Button colorScheme={colorScheme} type="submit" ml="auto">
+            <ModalFooter>
+              <Button colorScheme={colorScheme} type="submit" ml="auto" px={8}>
                 Add
               </Button>
             </ModalFooter>

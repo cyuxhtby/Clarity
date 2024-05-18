@@ -124,11 +124,11 @@ const AddNote = () => {
           backdropFilter={backdropFilter}
           borderRadius="xl"
           mx={4}
-          my={20}
+          my={36}
           p={6}
           boxShadow="xl"
         >
-          <ModalHeader>Let's save this for later</ModalHeader>
+          <ModalHeader>A note for later</ModalHeader>
           <form onSubmit={handleSubmit}>
             <ModalBody>
               <FormControl>

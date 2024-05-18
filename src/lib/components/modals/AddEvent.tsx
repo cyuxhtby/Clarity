@@ -81,15 +81,14 @@ const AddEvent = () => {
           backdropFilter={backdropFilter}
           borderRadius="xl"
           mx={4}
-          my={20}
+          my={200}
           p={6}
           boxShadow="xl"
         >
-          <ModalHeader>What do you want to do?</ModalHeader>
+          <ModalHeader>A future event</ModalHeader>
           <form onSubmit={handleSubmit}>
             <ModalBody>
               <FormControl>
-                <FormLabel>I want to</FormLabel>
                 <Input
                   value={itemName}
                   onChange={(e) => setItemName(e.target.value)}
@@ -97,7 +96,7 @@ const AddEvent = () => {
               </FormControl>
 
               <FormControl mt={4}>
-                <FormLabel>By when?</FormLabel>
+                <FormLabel>When?</FormLabel>
                 <Input
                   type="datetime-local"
                   value={itemDateTime}

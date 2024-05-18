@@ -69,11 +69,11 @@ const AddTask: React.FC = () => {
           backdropFilter={backdropFilter}
           borderRadius="xl"
           mx={4}
-          my={40}
+          my={60}
           p={6}
           boxShadow="xl"
         >
-          <ModalHeader>New task</ModalHeader>
+          <ModalHeader>A task to complete</ModalHeader>
           <form onSubmit={handleSubmit}>
             <ModalBody>
               <FormControl>
