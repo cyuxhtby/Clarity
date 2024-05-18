@@ -9,6 +9,8 @@ interface Task {
   title: string;
   completed: boolean;
   order: number;
+  date?: string;
+  hour?: string;
 }
 
 interface HourBlockProps {
@@ -16,16 +18,14 @@ interface HourBlockProps {
   tasks: Task[];
   addTask: (hour: string, taskText: string) => void;
   removeTask: (task: Task) => void;
-  isFutureDate?: boolean;
+  assignTaskTime: (taskId: string, date: string, hour: string) => void;
 }
 
-const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask, isFutureDate = false }) => {
+const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask, assignTaskTime }) => {
   const [newTask, setNewTask] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
-  const [isPassed, setIsPassed] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const bg = useColorModeValue('gray.200', 'gray.700');
-  const isPassedBg = isPassed ? useColorModeValue('gray.200', 'gray.900') : 'blackAlpha.50';
   const borderColor = useColorModeValue('whiteAlpha.50', 'white');
   const [isSwiping, setIsSwiping] = useState(false);
 
@@ -34,25 +34,6 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
       textareaRef.current.focus();
     }
   }, [isAddingTask]);
-
-  useEffect(() => {
-    if (!isFutureDate) {
-      const updateIsPassed = () => {
-        const currentHour = new Date().getHours();
-        const blockHour = parseInt(hour.split(':')[0]);
-        setIsPassed(blockHour < currentHour);
-      };
-
-      updateIsPassed();
-      const timer = setInterval(updateIsPassed, 120000);
-
-      return () => {
-        clearInterval(timer);
-      };
-    } else {
-      setIsPassed(false);
-    }
-  }, [hour, isFutureDate]);
 
   const handleAddTask = () => {
     if (newTask.trim() !== '') {
@@ -95,7 +76,7 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
       {...swipeHandlers}
       ref={setNodeRef}
       w="100%"
-      bg={isPassedBg}
+      bg={bg}
       p={4}
       borderWidth="1px"
       borderRadius="lg"
@@ -113,7 +94,7 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
       <Box flex="1" overflow="hidden">
         <VStack align="start" w="100%">
           {tasks.map((task) => (
-            <TaskItem key={task.id} id={task.id} task={task} removeTask={removeTask} />
+            <TaskItem key={task.id} id={task.id} task={task} removeTask={removeTask} assignTaskTime={assignTaskTime} />
           ))}
           {isAddingTask && (
             <Textarea

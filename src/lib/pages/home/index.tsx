@@ -11,13 +11,13 @@ import Countdown from '~/lib/components/Countdown';
 import Notes from '~/lib/components/Notes';
 import Logs from '~/lib/components/Logs';
 import Checklist from '~/lib/components/Checklist';
-import ActivityPlanner from '~/lib/components/ActivityPlanner';
-import ActivityPlannerWeekly from '~/lib/components/ActivityPlannerWeekly';
+import DailyPlanner from '~/lib/components/DailyPlanner';
+import WeeklyPlanner from '~/lib/components/WeeklyPlanner';
 
 const Home = () => {
   const { user } = useAuth();
   const { currentView, setCurrentView, viewOrder } = useView();
-  const viewComponents = [ActivityPlannerWeekly,ActivityPlanner, Welcome, Countdown, Checklist, Notes, Logs];
+  const viewComponents = [WeeklyPlanner,DailyPlanner, Welcome, Countdown, Checklist, Notes, Logs];
   const viewIndex = viewOrder.indexOf(currentView);
 
   useEffect(() => {

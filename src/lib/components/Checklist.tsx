@@ -12,6 +12,8 @@ interface Task {
   title: string;
   completed: boolean;
   order: number;
+  date?: string;
+  hour?: string;
 }
 
 const Checklist: React.FC = () => {
@@ -33,6 +35,7 @@ const Checklist: React.FC = () => {
       const unsubscribe = onSnapshot(tasksRef, (querySnapshot) => {
         const tasksData = querySnapshot.docs
           .map((doc) => ({ id: doc.id, ...doc.data() } as Task))
+          .filter((task) => !task.date)
           .sort((a, b) => a.order - b.order);
         setTasks(tasksData);
       });
@@ -58,9 +61,8 @@ const Checklist: React.FC = () => {
             ml={4}
             onClick={async () => {
               await setDoc(doc(db, 'users', user.uid, 'tasks', task.id), {
-                title: task.title,
+                ...task,
                 completed: false,
-                order: task.order,
               });
               toast.close(toastId);
             }}
@@ -70,6 +72,12 @@ const Checklist: React.FC = () => {
         </Box>
       ),
     });
+  };
+
+  const assignTaskTime = async (taskId: string, date: string, hour: string) => {
+    const taskDocRef = doc(db, 'users', user.uid, 'tasks', taskId);
+    await updateDoc(taskDocRef, { date, hour });
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
   };
 
   const handleDragEnd = async (event: any) => {
@@ -95,15 +103,10 @@ const Checklist: React.FC = () => {
         <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
           {tasks.length > 0 ? (
             tasks.map((task) => (
-              <TaskItem key={task.id} id={task.id} task={task} removeTask={removeTask} />
+              <TaskItem key={task.id} id={task.id} task={task} removeTask={removeTask} assignTaskTime={assignTaskTime} />
             ))
           ) : (
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              height="100%"
-            >
+            <Box display="flex" alignItems="center" justifyContent="center" height="100%">
               <Text fontSize="lg" fontWeight="bold">
                 Your tasks will show here
               </Text>

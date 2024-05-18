@@ -23,7 +23,7 @@ interface Task {
   order: number;
 }
 
-const ActivityPlannerWeekly: React.FC = () => {
+const WeeklyPlanner: React.FC = () => {
   const [activities, setActivities] = useState<Activities>({});
   const [expandedDays, setExpandedDays] = useState<{ [key: string]: boolean }>({});
   const { user } = useAuth();
@@ -216,4 +216,4 @@ const ActivityPlannerWeekly: React.FC = () => {
   );
 };
 
-export default ActivityPlannerWeekly;
+export default WeeklyPlanner;
