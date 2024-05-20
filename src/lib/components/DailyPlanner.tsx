@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
+import { format, addDays, startOfTomorrow } from 'date-fns';
 import HourBlock from './HourBlock';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 
@@ -134,34 +135,21 @@ const DailyPlanner: React.FC = () => {
 
   const today = new Date().toISOString().split('T')[0];
   const currentHour = new Date().getHours();
-  const currentMinute = new Date().getMinutes();
-
-  const pastTasks = tasks.filter(
-    (task) =>
-      task.date === today && parseInt(task.hour!.split(':')[0]) < currentHour
-  );
-  const currentTasks = tasks.filter(
-    (task) =>
-      task.date === today && parseInt(task.hour!.split(':')[0]) === currentHour
-  );
-  const futureTasks = tasks.filter(
-    (task) =>
-      task.date === today && parseInt(task.hour!.split(':')[0]) > currentHour
-  );
-
+  
   return (
     <>
-      <Text fontSize="lg" fontWeight="bold" mb={2}>
-        Today
+      <Text fontSize="lg" fontWeight="bold" mt={4} mb={2}>
+        {format(new Date(), 'EEEE MMMM d')}
       </Text>
       <DndContext onDragEnd={handleDragEnd}>
         <VStack
           width="full"
           borderRadius="md"
-          spacing={4}
+          spacing={1}
           zIndex={20}
           position="relative"
         >
+          {/* Future and Current Tasks */}
           {hours.map((hour) => {
             const hourNumber = parseInt(hour.split(':')[0]);
             const isCurrentHour = hourNumber === currentHour;
@@ -170,6 +158,7 @@ const DailyPlanner: React.FC = () => {
             if (isPastHour) return null;
 
             return (
+              <>
               <HourBlock
                 key={hour}
                 hour={hour}
@@ -182,33 +171,31 @@ const DailyPlanner: React.FC = () => {
                 isCurrentHour={isCurrentHour}
                 isPastHour={isPastHour}
               />
+              </>
             );
           })}
-          {pastTasks.length > 0 && (
-            <Box mt={2} w="full">
-              {hours.map((hour) => {
-                const hourNumber = parseInt(hour.split(':')[0]);
-                const isPastHour = hourNumber < currentHour;
+          {/* Past Tasks */}
+          {hours.map((hour) => {
+            const hourNumber = parseInt(hour.split(':')[0]);
+            const isPastHour = hourNumber < currentHour;
 
-                if (!isPastHour) return null;
+            if (!isPastHour) return null;
 
-                return (
-                  <HourBlock
-                    key={hour}
-                    hour={hour}
-                    tasks={tasks.filter(
-                      (task) => task.date === today && task.hour === hour
-                    )}
-                    addTask={addTask}
-                    removeTask={removeTask}
-                    assignTaskTime={assignTaskTime}
-                    isCurrentHour={false}
-                    isPastHour={isPastHour}
-                  />
-                );
-              })}
-            </Box>
-          )}
+            return (
+              <HourBlock
+                key={hour}
+                hour={hour}
+                tasks={tasks.filter(
+                  (task) => task.date === today && task.hour === hour
+                )}
+                addTask={addTask}
+                removeTask={removeTask}
+                assignTaskTime={assignTaskTime}
+                isCurrentHour={false}
+                isPastHour={isPastHour}
+              />
+            );
+          })}
           <Box height={10} />
         </VStack>
       </DndContext>

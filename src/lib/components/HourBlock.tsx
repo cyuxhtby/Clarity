@@ -76,8 +76,8 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
     id: hour,
   });
 
-  const handleClick = () => {
-    if (!isSwiping && !isAddingTask) {
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isSwiping && !isAddingTask && e.target instanceof HTMLInputElement === false) {
       setIsAddingTask(true);
     }
   };

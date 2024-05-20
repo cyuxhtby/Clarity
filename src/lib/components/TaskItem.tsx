@@ -19,9 +19,10 @@ interface TaskItemProps {
   task: Task;
   removeTask: (task: Task) => void;
   assignTaskTime?: (taskId: string, date: string, hour: string) => void;
+  noGrabber?: boolean;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ id, task, removeTask, assignTaskTime }) => {
+const TaskItem: React.FC<TaskItemProps> = ({ id, task, removeTask, assignTaskTime, noGrabber }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pressTimer, setPressTimer] = useState<number | null>(null);
@@ -70,6 +71,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ id, task, removeTask, assignTaskTim
                   size="lg"
                   isChecked={task.completed}
                   onChange={() => removeTask(task)}
+                  onClick={(e) => e.stopPropagation()}
                   sx={{
                     '.chakra-checkbox__control': {
                       borderColor: useColorModeValue('black', 'white'),
@@ -88,14 +90,16 @@ const TaskItem: React.FC<TaskItemProps> = ({ id, task, removeTask, assignTaskTim
                   {task.title}
                 </Text>
               </Flex>
-              <IconButton
-                aria-label="Drag task"
-                icon={<GoGrabber />}
-                size="sm"
-                variant="ghost"
-                cursor="grab"
-                {...listeners}
-              />
+              {!noGrabber && (
+                <IconButton
+                  aria-label="Drag task"
+                  icon={<GoGrabber />}
+                  size="sm"
+                  variant="ghost"
+                  cursor="grab"
+                  {...listeners}
+                />
+              )}
             </Flex>
           </Box>
         </Flex>
