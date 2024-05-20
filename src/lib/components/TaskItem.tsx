@@ -22,7 +22,7 @@ interface TaskItemProps {
   noGrabber?: boolean;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ id, task, removeTask, assignTaskTime, noGrabber }) => {
+const TaskItem: React.FC<TaskItemProps> = ({ id, task, removeTask, assignTaskTime, noGrabber = false }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [pressTimer, setPressTimer] = useState<number | null>(null);
@@ -66,7 +66,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ id, task, removeTask, assignTaskTim
         <Flex justify="center" width="100%">
           <Box width="400px" borderWidth="1px" borderRadius="lg" padding="2" paddingLeft="12px" paddingRight="8px">
             <Flex alignItems="center" justifyContent="space-between">
-              <Flex alignItems="center">
+              <Flex alignItems="center" flex="1">
                 <Checkbox
                   size="lg"
                   isChecked={task.completed}
@@ -90,7 +90,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ id, task, removeTask, assignTaskTim
                   {task.title}
                 </Text>
               </Flex>
-              {!noGrabber && (
+              {!noGrabber ? (
                 <IconButton
                   aria-label="Drag task"
                   icon={<GoGrabber />}
@@ -99,6 +99,10 @@ const TaskItem: React.FC<TaskItemProps> = ({ id, task, removeTask, assignTaskTim
                   cursor="grab"
                   {...listeners}
                 />
+              ) : (
+                <Text ml={2} color={useColorModeValue('gray.500', 'gray.300')}>
+                  {task.hour}
+                </Text>
               )}
             </Flex>
           </Box>

@@ -108,7 +108,7 @@ const Checklist: React.FC = () => {
           ) : (
             <Box display="flex" alignItems="center" justifyContent="center" height="100%">
               <Text fontSize="lg" fontWeight="bold">
-                Your tasks will show here
+                Your unassigned tasks will show here
               </Text>
             </Box>
           )}
