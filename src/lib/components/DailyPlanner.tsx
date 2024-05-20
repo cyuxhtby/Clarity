@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { VStack, Text, Box } from '@chakra-ui/react';
-import { collection, getDocs, doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  setDoc,
+  deleteDoc,
+} from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
 import HourBlock from './HourBlock';
@@ -26,8 +33,9 @@ const DailyPlanner: React.FC = () => {
       try {
         const tasksRef = collection(db, 'users', user.uid, 'tasks');
         const tasksSnapshot = await getDocs(tasksRef);
-        const tasksData: Task[] = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
-        console.log('Fetched tasks:', tasksData); // Debug: Log fetched tasks
+        const tasksData: Task[] = tasksSnapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() }) as Task
+        );
         setTasks(tasksData);
       } catch (error) {
         console.error('Error fetching tasks:', error);
@@ -40,14 +48,20 @@ const DailyPlanner: React.FC = () => {
   const addTask = async (hour: string, taskText: string) => {
     if (!user) return;
 
-    const newTask: Task = { id: `${hour}_${Date.now()}`, title: taskText, completed: false, order: 0, date: new Date().toISOString().split('T')[0], hour };
+    const newTask: Task = {
+      id: `${hour}_${Date.now()}`,
+      title: taskText,
+      completed: false,
+      order: 0,
+      date: new Date().toISOString().split('T')[0],
+      hour,
+    };
     const taskDocRef = doc(db, 'users', user.uid, 'tasks', newTask.id);
 
     setTasks((prevTasks) => [...prevTasks, newTask]);
 
     try {
       await setDoc(taskDocRef, newTask);
-      console.log('Task added:', newTask); // Debug: Log added task
     } catch (error) {
       console.error('Error adding task:', error);
     }
@@ -62,7 +76,6 @@ const DailyPlanner: React.FC = () => {
 
     try {
       await deleteDoc(taskDocRef);
-      console.log('Task removed:', task); // Debug: Log removed task
     } catch (error) {
       console.error('Error removing task:', error);
     }
@@ -85,7 +98,6 @@ const DailyPlanner: React.FC = () => {
 
     try {
       await updateDoc(taskDocRef, { date, hour });
-      console.log('Task time assigned:', taskId, date, hour); // Debug: Log assigned task time
     } catch (error) {
       console.error('Error assigning task time:', error);
     }
@@ -106,7 +118,6 @@ const DailyPlanner: React.FC = () => {
     try {
       const taskDocRef = doc(db, 'users', user.uid, 'tasks', taskId);
       await updateDoc(taskDocRef, { hour: destinationHour });
-      console.log('Task moved:', taskId, destinationHour); // Debug: Log moved task
     } catch (error) {
       console.error('Error updating task:', error);
     }
@@ -122,8 +133,21 @@ const DailyPlanner: React.FC = () => {
   const hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`);
 
   const today = new Date().toISOString().split('T')[0];
-  const tasksForToday = tasks.filter(task => task.date === today);
-  console.log('Tasks for today:', tasksForToday); // Debug: Log tasks for today
+  const currentHour = new Date().getHours();
+  const currentMinute = new Date().getMinutes();
+
+  const pastTasks = tasks.filter(
+    (task) =>
+      task.date === today && parseInt(task.hour!.split(':')[0]) < currentHour
+  );
+  const currentTasks = tasks.filter(
+    (task) =>
+      task.date === today && parseInt(task.hour!.split(':')[0]) === currentHour
+  );
+  const futureTasks = tasks.filter(
+    (task) =>
+      task.date === today && parseInt(task.hour!.split(':')[0]) > currentHour
+  );
 
   return (
     <>
@@ -131,17 +155,60 @@ const DailyPlanner: React.FC = () => {
         Today
       </Text>
       <DndContext onDragEnd={handleDragEnd}>
-        <VStack width="full" borderRadius="md" spacing={4} zIndex={20} position="relative">
-          {hours.map((hour) => (
-            <HourBlock
-              key={hour}
-              hour={hour}
-              tasks={tasksForToday.filter(task => task.hour === hour).sort((a, b) => a.order - b.order)}
-              addTask={addTask}
-              removeTask={removeTask}
-              assignTaskTime={assignTaskTime}
-            />
-          ))}
+        <VStack
+          width="full"
+          borderRadius="md"
+          spacing={4}
+          zIndex={20}
+          position="relative"
+        >
+          {hours.map((hour) => {
+            const hourNumber = parseInt(hour.split(':')[0]);
+            const isCurrentHour = hourNumber === currentHour;
+            const isPastHour = hourNumber < currentHour;
+
+            if (isPastHour) return null;
+
+            return (
+              <HourBlock
+                key={hour}
+                hour={hour}
+                tasks={tasks.filter(
+                  (task) => task.date === today && task.hour === hour
+                )}
+                addTask={addTask}
+                removeTask={removeTask}
+                assignTaskTime={assignTaskTime}
+                isCurrentHour={isCurrentHour}
+                isPastHour={isPastHour}
+              />
+            );
+          })}
+          {pastTasks.length > 0 && (
+            <Box mt={2} w="full">
+              {hours.map((hour) => {
+                const hourNumber = parseInt(hour.split(':')[0]);
+                const isPastHour = hourNumber < currentHour;
+
+                if (!isPastHour) return null;
+
+                return (
+                  <HourBlock
+                    key={hour}
+                    hour={hour}
+                    tasks={tasks.filter(
+                      (task) => task.date === today && task.hour === hour
+                    )}
+                    addTask={addTask}
+                    removeTask={removeTask}
+                    assignTaskTime={assignTaskTime}
+                    isCurrentHour={false}
+                    isPastHour={isPastHour}
+                  />
+                );
+              })}
+            </Box>
+          )}
           <Box height={10} />
         </VStack>
       </DndContext>

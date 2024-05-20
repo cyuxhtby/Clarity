@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { HStack, Box, Text, Textarea, useColorModeValue, VStack } from '@chakra-ui/react';
+import { HStack, Box, Text, Textarea, useColorModeValue, VStack, Progress } from '@chakra-ui/react';
 import TaskItem from './TaskItem';
 import { useDroppable } from '@dnd-kit/core';
 import { useSwipeable } from 'react-swipeable';
@@ -19,22 +19,37 @@ interface HourBlockProps {
   addTask: (hour: string, taskText: string) => void;
   removeTask: (task: Task) => void;
   assignTaskTime: (taskId: string, date: string, hour: string) => void;
-  isFutureDate?: boolean;
+  isCurrentHour?: boolean;
+  isPastHour?: boolean;
 }
 
-const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask, assignTaskTime, isFutureDate }) => {
+const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask, assignTaskTime, isCurrentHour, isPastHour }) => {
   const [newTask, setNewTask] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const bg = useColorModeValue('gray.200', 'gray.700');
+  const bg = useColorModeValue('gray.200', 'gray.600');
+  const pastBg = useColorModeValue('gray.400', 'gray.700');
   const borderColor = useColorModeValue('whiteAlpha.50', 'white');
   const [isSwiping, setIsSwiping] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (isAddingTask && textareaRef.current) {
       textareaRef.current.focus();
     }
   }, [isAddingTask]);
+
+  useEffect(() => {
+    if (isCurrentHour) {
+      const interval = setInterval(() => {
+        const now = new Date();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        setProgress((minutes * 60 + seconds) / 36);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isCurrentHour]);
 
   const handleAddTask = () => {
     if (newTask.trim() !== '') {
@@ -77,15 +92,17 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
       {...swipeHandlers}
       ref={setNodeRef}
       w="100%"
-      bg={bg}
+      bg={isPastHour ? pastBg : bg}
       p={4}
       borderWidth="1px"
       borderRadius="lg"
-      spacing={4}
+      spacing={2}
       alignItems="center"
       borderColor={isOver ? borderColor : 'whiteAlpha.50'}
       overflow="hidden"
       onClick={handleClick}
+      position="relative"
+      mb={2}
     >
       <Box display="flex" justifyContent="center" alignItems="center" flexShrink={0}>
         <Text fontSize="md" fontWeight="medium">
@@ -97,7 +114,7 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
           {tasks.map((task) => (
             <TaskItem key={task.id} id={task.id} task={task} removeTask={removeTask} assignTaskTime={assignTaskTime} />
           ))}
-          {isAddingTask && !isFutureDate && (
+          {isAddingTask && (
             <Textarea
               ref={textareaRef}
               value={newTask}
@@ -112,6 +129,19 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
           )}
         </VStack>
       </Box>
+      {isCurrentHour && (
+        <Progress
+          value={progress}
+          size="xs"
+          colorScheme="blue"
+          position="absolute"
+          bottom="0"
+          left="0"
+          right="0"
+          height="4px"
+          borderRadius="lg"
+        />
+      )}
     </HStack>
   );
 };
