@@ -16,7 +16,7 @@ interface Task {
 interface HourBlockProps {
   hour: string;
   tasks: Task[];
-  addTask: (hour: string, taskText: string) => void;
+  addTask: (taskText: string) => void;
   removeTask: (task: Task) => void;
   assignTaskTime: (taskId: string, date: string, hour: string) => void;
   isCurrentHour?: boolean;
@@ -53,7 +53,7 @@ const HourBlock: React.FC<HourBlockProps> = ({ hour, tasks, addTask, removeTask,
 
   const handleAddTask = () => {
     if (newTask.trim() !== '') {
-      addTask(hour, newTask);
+      addTask(newTask);
       setNewTask('');
       setIsAddingTask(false);
     } else {

@@ -46,7 +46,7 @@ const DailyPlanner: React.FC = () => {
     fetchTasks();
   }, [user]);
 
-  const addTask = async (hour: string, taskText: string) => {
+  const addTask = async (taskText: string, hour: string) => {
     if (!user) return;
 
     const newTask: Task = {
@@ -135,7 +135,7 @@ const DailyPlanner: React.FC = () => {
 
   const today = new Date().toISOString().split('T')[0];
   const currentHour = new Date().getHours();
-  
+
   return (
     <>
       <Text fontSize="lg" fontWeight="bold" mt={4} mb={2}>
@@ -165,7 +165,7 @@ const DailyPlanner: React.FC = () => {
                 tasks={tasks.filter(
                   (task) => task.date === today && task.hour === hour
                 )}
-                addTask={addTask}
+                addTask={(taskText) => addTask(taskText, hour)}
                 removeTask={removeTask}
                 assignTaskTime={assignTaskTime}
                 isCurrentHour={isCurrentHour}
@@ -188,7 +188,7 @@ const DailyPlanner: React.FC = () => {
                 tasks={tasks.filter(
                   (task) => task.date === today && task.hour === hour
                 )}
-                addTask={addTask}
+                addTask={(taskText) => addTask(taskText, hour)}
                 removeTask={removeTask}
                 assignTaskTime={assignTaskTime}
                 isCurrentHour={false}
