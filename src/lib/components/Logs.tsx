@@ -36,7 +36,7 @@ const Logs = () => {
       }));
       console.log("Fetched logs data:", logsData);
   
-      const sortedLogsData = logsData.sort((a, b) => b.dateTime.localeCompare(a.dateTime));
+      const sortedLogsData = logsData.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
       setLogs(sortedLogsData);
     });
   
