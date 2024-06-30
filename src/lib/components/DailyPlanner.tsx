@@ -23,14 +23,13 @@ interface Task {
   hour?: string;
 }
 
-const getTodayDate = () => {
-  const now = new Date();
-  return now.getHours() < 6 ? format(addDays(now, -1), 'yyyy-MM-dd') : format(now, 'yyyy-MM-dd');
-};
-
 const DailyPlanner: React.FC = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const now = new Date();
+  const today = format(now, 'yyyy-MM-dd');
+  const hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`);
+  const currentHour = now.getHours();
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -54,14 +53,12 @@ const DailyPlanner: React.FC = () => {
   const addTask = async (taskText: string, hour: string) => {
     if (!user) return;
 
-    const taskDate = getTodayDate();
-
     const newTask: Task = {
       id: `${hour}_${Date.now()}`,
       title: taskText,
       completed: false,
       order: 0,
-      date: taskDate,
+      date: today,
       hour,
     };
     const taskDocRef = doc(db, 'users', user.uid, 'tasks', newTask.id);
@@ -138,16 +135,10 @@ const DailyPlanner: React.FC = () => {
     }
   };
 
-  const hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`);
-
-  const today = getTodayDate();
-  const currentHour = new Date().getHours();
-
-
   return (
     <>
       <Text fontSize="lg" fontWeight="bold" mt={4} mb={2}>
-        {format(new Date(), 'EEEE MMMM d')}
+        {format(new Date(today), 'EEEE MMMM d')}
       </Text>
       <DndContext onDragEnd={handleDragEnd}>
         <VStack
