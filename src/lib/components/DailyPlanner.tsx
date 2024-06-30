@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore';
 import { firestore as db } from '~/lib/utils/firebaseConfig';
 import { useAuth } from '~/lib/contexts/AuthContext';
-import { format, addDays, startOfTomorrow } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import HourBlock from './HourBlock';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 
@@ -22,6 +22,11 @@ interface Task {
   date?: string;
   hour?: string;
 }
+
+const getTodayDate = () => {
+  const now = new Date();
+  return now.getHours() < 6 ? format(addDays(now, -1), 'yyyy-MM-dd') : format(now, 'yyyy-MM-dd');
+};
 
 const DailyPlanner: React.FC = () => {
   const { user } = useAuth();
@@ -49,12 +54,14 @@ const DailyPlanner: React.FC = () => {
   const addTask = async (taskText: string, hour: string) => {
     if (!user) return;
 
+    const taskDate = getTodayDate();
+
     const newTask: Task = {
       id: `${hour}_${Date.now()}`,
       title: taskText,
       completed: false,
       order: 0,
-      date: new Date().toISOString().split('T')[0],
+      date: taskDate,
       hour,
     };
     const taskDocRef = doc(db, 'users', user.uid, 'tasks', newTask.id);
@@ -133,8 +140,9 @@ const DailyPlanner: React.FC = () => {
 
   const hours = Array.from({ length: 18 }, (_, i) => `${i + 6}:00`);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayDate();
   const currentHour = new Date().getHours();
+
 
   return (
     <>
